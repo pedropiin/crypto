@@ -1,0 +1,61 @@
+1.3.1) Com $1.000.000, o atacante conseguirá organizar 10.000 circuitos ASIC paralelamente.
+Mesmo assim, checando 5*10^8 keys por segundos, esse sistema demoraria 1901285268841736960 anos
+para completar o brute-force-attack, isto é, quase o dobro da "idade" do Universo.
+1.3.2) Um computador precisaria checar 3,4*10^33 keys por segundo.
+
+1.4.1) |key space| = 128^8
+1.4.2) 64 bits
+
+1.5.1) 15*29 mod13 = 2*3 mod13 = 6 mod13
+1.5.2) 2*29 mod13 = 2*3 mod13 = 6 mod13
+1.5.3) 2*3 mod13 = 6 mod13
+1.5.4) -11*3 mod13 = 2*3 mod13
+
+1.6.1) 1/5 mod13 = (5*x) mod13 = 1 => x = 8
+1.6.2) 1/5 mod7 => (5*x) mod7 = 1 => x = 3
+1.6.3) 3*2/5 mod7 = (3*2)/5 mod7 = 6*3 mod7 = 4 mod7
+
+1.7)
++ | 0 1 2 3
+0 | 0 1 2 3
+1 | 1 2 3 0
+2 | 2 3 0 1 
+3 | 3 0 1 2 
+1.7.1)
+* | 0 1 2 3
+0 | 0 0 0 0
+1 | 0 1 2 3
+2 | 0 2 0 2 
+3 | 0 3 2 1 
+1.7.2)
++ | 0 1 2 3 4       * | 0 1 2 3 4
+0 | 0 1 2 3 4       0 | 0 0 0 0 0 
+1 | 1 2 3 4 0       1 | 0 1 2 3 4
+2 | 2 3 4 0 1       2 | 0 2 4 1 3
+3 | 3 4 0 1 2       3 | 0 3 1 4 2
+4 | 4 0 1 2 3       4 | 0 4 3 2 1
+1.7.3)
++ | 0 1 2 3 4 5       * | 0 1 2 3 4 5
+0 | 0 1 2 3 4 5       0 | 0 0 0 0 0 0
+1 | 1 2 3 4 5 0       1 | 0 1 2 3 4 5
+2 | 2 3 4 5 0 1       2 | 0 2 4 0 2 4
+3 | 3 4 5 0 1 2       3 | 0 3 0 3 0 3
+4 | 4 5 0 1 2 3       4 | 0 4 2 0 4 2
+5 | 5 0 1 2 3 4       5 | 0 5 4 3 2 1
+1.7.4) Os elementos são 0 e 2 para Z4 e 0, 2, 3 e 4 para Z6. Todos os elementos de Z5 possuem
+inverso multiplicativo já que 5 é um número primo, e portanto, todos os números de
+seu anel serão primos entre si.
+
+1.8) Inverso multiplicativo de 5 em Z11: 9
+Inverso multiplicativo de 5 em Z12: 5
+Inverso multiplicativo de 5 em Z13: 8
+
+1.9.1) x = 3^2 mod13 => x = 13n + 9 / n∈Z
+1.9.2) x = 7^2 mod13 => x = 13n + 10 / n∈Z
+1.9.3) x = 7^100 mod13 => x = 49^50 mod13 => x = 10^50 mod13 => x = 100^25 mod13 => x = 9^25 mod13 => x = 243^10 mod13 => x = 9^10 mod13 => x = 81^5 mod13 => x = 3^5 mod 13 => x = 13n + 9 / n∈Z
+1.9.4) 7^x = 11 mod13 => ?????
+
+1.10.1) fi(4) = 2
+1.10.2) fi(5) = 4
+1.10.3) fi(9) = 6
+1.10.4) fi(26) = 12

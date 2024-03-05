@@ -2,14 +2,6 @@ from matplotlib import pyplot as plt
 import string
 import sys
 
-#inicializar vetor alfabeto
-#receber cifra
-#vetor frequencia de letras cifradas
-#ordenar vetor frequencia acompanhando alfabeto
-#plotar frequencia
-
-#associar frequencia da cifra com frequencia ingles
-#traduzir
 
 def frequency_analysis():
     alfabeto = list(string.ascii_lowercase)
@@ -85,7 +77,7 @@ def post_analysis_correction(frequencia_lexical_cifra, frequencia_ingles_ordenad
         print(frequencia_ingles_ordenada)
 
         with open('cypher.txt', 'r', encoding='utf-8') as cifra:
-            with open('post_frequency.txt', 'w', encoding='utf-8') as decifra:
+            with open('post_correction.txt', 'w', encoding='utf-8') as decifra:
                 while True:
                     char_cifra = cifra.read(1)
                     if not char_cifra:
@@ -100,9 +92,7 @@ def post_analysis_correction(frequencia_lexical_cifra, frequencia_ingles_ordenad
 
                     index_letra_cifrada = frequencia_lexical_cifra[1].index(char_cifra)
                     decifra.write(frequencia_ingles_ordenada[1][index_letra_cifrada])
-        correcao = bool(input("Deseja corrigir mais alguma letra? 1: Sim | 0: Não\n"))
-
-
+        correcao = bool(int(input("Deseja corrigir mais alguma letra? 1: Sim | 0: Não\n")))
 
 
 def main():
@@ -110,7 +100,7 @@ def main():
     frequencia_ingles_ordenada = decypher(frequencia_lexical_cifra)
     print(frequencia_lexical_cifra)
     print(frequencia_ingles_ordenada)
-    correcao = bool(input("Deseja fazer alterações? 1: Sim | 0: Não\n"))
+    correcao = bool(int(input("Deseja fazer alterações? 1: Sim | 0: Não\n")))
     if (correcao == True):
         post_analysis_correction(frequencia_lexical_cifra, frequencia_ingles_ordenada)
 
