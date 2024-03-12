@@ -59,3 +59,8 @@ Inverso multiplicativo de 5 em Z13: 8
 1.10.2) fi(5) = 4
 1.10.3) fi(9) = 6
 1.10.4) fi(26) = 12
+
+1.11.1) e(x) = 7x + 22 mod26
+d(y) = mul_inv(7) * (y - 22) mod26
+Inverso multiplicativo de 7 em Z26: 15
+Portanto => d(y) = 15 * (y-22) mod26

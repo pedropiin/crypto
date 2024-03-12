@@ -57,8 +57,7 @@ def decypher(frequencia_cifra):
     return frequencia_ingles_ordenada
 
 def post_analysis_correction(frequencia_lexical_cifra, frequencia_ingles_ordenada):
-    correcao = True
-    while correcao == True:
+    while True:
         char_input = input("Digite o caracter que deseja alterar de posição: ")
         char_equi = input("Digite o caracter que ele irá se equivaler a: ")
         indice_letra_input = frequencia_lexical_cifra[1].index(char_input)
@@ -92,7 +91,6 @@ def post_analysis_correction(frequencia_lexical_cifra, frequencia_ingles_ordenad
 
                     index_letra_cifrada = frequencia_lexical_cifra[1].index(char_cifra)
                     decifra.write(frequencia_ingles_ordenada[1][index_letra_cifrada])
-        correcao = bool(int(input("Deseja corrigir mais alguma letra? 1: Sim | 0: Não\n")))
 
 
 def main():
