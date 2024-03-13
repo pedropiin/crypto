@@ -107,4 +107,36 @@ Plaintext =  1001 0010 0110 1101 1001 0010 0110
 Cyphertext = 1011 1100 0011 0001 0010 1011 0001
 Keystream =  0010 1110 0101 1100 1011 1001 0111
 Nota-se que a keystream tem um período de 7 bits. Portanto, temos que 2^m - 1 = 7 => m = 3.
-2.10.2)
+2.10.2) IV = [s2 = 1, s1 = 0, s0 = 0]
+2.10.3) 
+s3 = s2*p2 + s1*p1 + s0*p0 mod2 => 0 = 1*p2 + 0*p1 + 0*p0 mod2
+s4 = s3*p2 + s2*p1 + s1*p0 mod2 => 1 = 0*p2 + 1*p1 + 0*p0 mod2
+s5 = s4*p2 + s3*p1 + s2*p0 mod2 => 1 = 1*p2 + 0*p1 + 1*p0 mod2
+
+De (1), temos que p2 = 0, já que único bit da key stream não nulo é s2, e 
+sabemos que s3 = 0. Portanto, s2 tem que ser zerado através do produto com p2. Do mesmo jeito
+temos que p1 = 1. Por último, p0 = 1. Portanto
+FC = [p2 = 0, p1 = 1, p0 = 1] => Polinomio = (0, 1, 4)
+
+2.11.1) 
+W = 10110(2) => j = 01001(2)
+P = 01111(2) => 5 = 11111(2)
+I = 01000(2) => a = 00000(2)
+s0 = x0 + y0 mod2 = 1
+s1 = x1 + y1 mod2 = 1
+s2 = x2 + y2 mod2 = 1
+s3 = x3 + y3 mod2 = 1
+s4 = x4 + y4 mod2 = 1
+s5 = x5 + y5 mod2 = 1
+
+IV = (s5 = 1, s4 = 1, s3 = 1, s2 = 1, s1 = 1, s0 = 1)
+2.11.2)
+s6  = 0 = s5*p5 + s4*p4 + s3*p3 + s2*p2 + s1*p1 + s0*p0  => 1*p5 + 1*p4 + 1*p3 + 1*p2 + 1*p1 + 1*p0 = 0
+s7  = 0 = s6*p5 + s5*p4 + s4*p3 + s3*p2 + s2*p1 + s1*p0  => 0*p5 + 1*p4 + 1*p3 + 1*p2 + 1*p1 + 1*p0 = 0
+s8  = 0 = s7*p5 + s6*p4 + s5*p3 + s4*p2 + s3*p1 + s2*p0  => 0*p5 + 0*p4 + 1*p3 + 1*p2 + 1*p1 + 1*p0 = 0
+s9  = 0 = s8*p5 + s7*p4 + s6*p3 + s5*p2 + s4*p1 + s3*p0  => 0*p5 + 0*p4 + 0*p3 + 1*p2 + 1*p1 + 1*p0 = 0
+s10 = 0 = s9*p5 + s8*p4 + s7*p3 + s6*p2 + s5*p1 + s4*p0  => 0*p5 + 0*p4 + 0*p3 + 0*p2 + 1*p1 + 1*p0 = 0
+s11 = 1 = s10*p5 + s9*p4 + s8*p3 + s7*p2 + s6*p1 + s5*p0 => 0*p5 + 0*p4 + 0*p3 + 0*p2 + 0*p1 + 1*p0 = 1
+
+FC = (p5 = 1, p4 = 0, p3 = 0, p2 = 0, p1 = 0, p0 = 1)
+2.11.3)
