@@ -4,7 +4,7 @@ import numpy as np
 def xor(a, b):
     return (int(a) + int(b)) % 2
 
-def convert_text_bits(text):
+def text_to_bits(text):
     alfabeto = list(string.ascii_lowercase)
     for i in range(6):
         alfabeto.append(str(i))
@@ -25,8 +25,8 @@ def convert_text_bits(text):
     return t_bits
 
 def find_initialization_vector(plaintext, cyphertext, m):
-    ptext_bits = convert_text_bits(plaintext)
-    ctext_bits = convert_text_bits(cyphertext)
+    ptext_bits = text_to_bits(plaintext)
+    ctext_bits = text_to_bits(cyphertext)
 
     iv = []
     key_stream = []
@@ -36,7 +36,7 @@ def find_initialization_vector(plaintext, cyphertext, m):
         if i < m:
             iv.append(bit)
 
-    return iv, key_stream
+    return iv, key_stream, ctext_bits
 
 def find_feedback(iv, keystream, m): 
     coef_matrix = []
@@ -58,11 +58,50 @@ def find_feedback(iv, keystream, m):
             feedback[i] = 0
     return feedback
 
+def bin_to_char(num_bin):
+    alfabeto = list(string.ascii_lowercase)
+    for i in range(6):
+        alfabeto.append(str(i))
+
+
+
+def lfsr(keystream, feedback_coef, ctext_bits, m):
+    alfabeto = list(string.ascii_lowercase)
+    for i in range(6):
+        alfabeto.append(str(i))
+
+    for i in range(len(keystream), len(ctext_bits)):
+        new_s = 0
+        for j in range(m):
+            new_s += feedback_coef[j] * keystream[len(keystream)- m + j]
+        new_s = new_s % 2
+        keystream.append(int(new_s))
+
+    ptext_bits = []
+    for i in range(len(ctext_bits)):
+        ptext_bits.append(xor(keystream[i], ctext_bits[i]))
+
+    plaintext = ""
+    num_it = ""
+    for i in range(len(ptext_bits)):
+        if (i + 1) % 5 == 0:
+            num_it += str(ptext_bits[i])
+            plaintext += alfabeto[int(num_it, base = 2)]
+            num_it = ""
+        else:
+            num_it += str(ptext_bits[i])
+
+    return plaintext
+
+
 def main():
-    plaintext = "wpi"
+    known_plaintext = "wpi"
     cyphertext = "j5a0edj2b"
     m = 6
-    iv, key_stream = find_initialization_vector(plaintext, cyphertext, m)
+    iv, key_stream, ctext_bits = find_initialization_vector(known_plaintext, cyphertext, m)
     feedback = find_feedback(iv, key_stream, m)
+    plaintext = lfsr(key_stream, feedback, ctext_bits, m)
+    
+    print(plaintext)
 
 main()
