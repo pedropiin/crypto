@@ -1,0 +1,84 @@
+4.1.1) O DES foi um padrão de criptografia feito pela IBM,
+e alterado posteriormente em junção com órgãos estatais 
+estadunidenses. Assim, foi a cifra padrão em diversas 
+aplicações e sistemas por múltiplos anos, até que ataques
+de força bruta começaram a se tornar menos custosos e práticos.
+Em cerca de um pouco mais de 10 anos, grupos já estavam 
+construindo peças de hardware montadas com o objetivo de 
+quebrar o DES. 
+Desse modo, órgãos estatais dos EUA iniciaram um "concurso"
+em busca de uma nova cifra que pudesse ser utilizada como
+novo padrão. Após alguns anos, e algumas submissões 
+analizadas, chegaram a conclusão que a cifra Rijndael era a 
+melhor, e passaram a utiliza-lá com o nome de AES, mais 
+especificamente sua versão de 128 bits. Portanto, desde 2002,
+AES é uma das principais cifras utilizadas em diversas aplicações,
+e também, e a cifra padrão oficial do governo estadunidense 
+para arquivos TOP SECRET. Até hoje, mesmo com mais de 20 anos
+de estudo, não descobriram nenhum ataque mais eficiente do que 
+um ataque de brute-force, que para 128 bits, é, atualmente,
+extremamente caro, demorado e inviável, tornando-a, então, 
+segura até os dias de hoje.
+
+4.1.2) Assim como falado acima, DES já não era mais seguro,
+sendo necessário apenas algumas horas para quebrar qualquer
+objeto cifrado por esse algoritmo. Então iniciou-se um concurso
+de submissões de novos designs e algoritmos para cifras.
+
+4.1.3) O algoritmo é chamado de Rijndael.
+
+4.1.4) Uma dupla de criptólogos belgas, chamados John Daemen 
+e Vincent Rijmen.
+
+4.1.5) O Rijndael suporta blocos e chaves de 128, 192 e 256 bits.
+Porém o AES foi e é estabelecido como o Rijndael de 128 bits.
+
+
+4.2)
++ | 0 1 2 3 4 5 6           * | 0 1 2 3 4 5 6
+0 | 0 1 2 3 4 5 6           0 | 0 0 0 0 0 0 0
+1 | 1 2 3 4 5 6 0           1 | 0 1 2 3 4 5 6
+2 | 2 3 4 5 6 0 1           2 | 0 2 4 6 1 3 5
+3 | 3 4 5 6 0 1 2           3 | 0 3 6 2 5 1 4
+4 | 4 5 6 0 1 2 3           4 | 0 4 1 5 2 6 3
+5 | 5 6 0 1 2 3 4           5 | 0 5 3 1 6 4 2
+6 | 6 0 1 2 3 4 5           6 | 0 6 5 4 3 2 1
+
+4.3)
+*      |   0   |   1   |   x   |  x+1  |  x^2  | x^2+1 | x^2+x |x^2+x+1|
+0      |   0   |   0   |   0   |   0   |   0   |   0   |   0   |   0   |
+1      |   0   |   1   |   x   |  x+1  |  x^2  | x^2+1 | x^2+x |x^2+x+1|
+x      |   0   |   x   |  x^2  | x^2+x |  x+1  |   1   |x^2+x+1| x^2+1 |
+x+1    |   0   |  x+1  | x^2+x | x^2+1 |x^2+x+1|  x^2  |   1   |   x   |
+x^2    |   0   |  x^2  |  x+1  |x^2+x+1| x^2+x |   x   | x^2+1 |   1   |
+x^2+1  |   0   | x^2+1 |   1   |  x^2  |   x   |x^2+x+1|  x+1  | x^2+x |
+X^2+x  |   0   | x^2+x |x^2+x+1|   1   | x^2+1 |  x+1  |   x   |  x^2  |
+x^2+x+1|   0   |x^2+x+1| x^2+1 |   x   |   1   | x^2+x |  x^2  |  x+1  |
+
+4.4.1) A(x) + B(x) = x^2 + 1 + x^3 + x^2 + 1 = x^3
+
+4.4.2) A(x) + B(x) = x^2 + 1 + x + 1 = x^2 + x
+Portanto, nota-se que o polinômio de redução não afeta em nada
+a operação de soma.
+
+4.5.1) A(x) * B(x) = (x^2 + 1) * (x^3 + x^2 + 1) =
+        = (x^5 + x^4 + x^2 + x^3 + x^2 + 1) = 
+        = (x^5 + x^4 + x^3 + 1) =
+        = (x^2 + x + x + 1 + x^3 + 1) mod P(X) = 
+        = (x^3 + x^2) mod P(x)
+
+4.5.2) A(x) * B(x) = (x^2 + 1) * (x + 1) =
+        = (x^3 + x^2 + x + 1) mod P(x)
+Portanto, nota-se que, diferentemente da operação de soma, 
+o polinômio de redução permite que os resultados do produto
+no corpo de extensão de Galois sejam ainda elementos do mesmo.
+
+4.6) (x^4 + x + 1) / (x^7 + x^6 + x^3 + x^2) =
+    = (x^4 + x + 1) * (x^7 + x^6 + x^3 + x^2)^-1 = 
+    = (x^4 + x + 1) * (x^5 + x^4 + x^3 + x^2 + 1) = 
+    = (x^9 + x^8 + x^7 + x^6 + x^4 + x^6 + x^5 + x^4 + x^3 + x + x^5 + x^4 + x^3 + x^2 + 1) = 
+    = (x^9 + x^8 + x^7 + 2x^6 + 2x^5 + 3x^4 + 2x^3 + x^2 + x + 1) = 
+    = (x^9 + x^8 + x^7 + x^4 + x^2 + x + 1) = 
+    = (x^5 + x^4 + x^2 + x + x^4 + x^3 + x + 1 + x^7 + x^4 + x^2 + x + 1) mod P(X) = 
+    = (x^7 + x^5 + 3x^4 + x^3 + 2x^2 + 3x + 2) mod P(x) = 
+    = (x^7 + x^5 + x^4 + x~3 + x) mod P(X)
