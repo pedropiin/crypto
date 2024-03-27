@@ -182,3 +182,46 @@ com apenas a mudança de um bit no input. Assim, ao longo dos
 próximos 9 rounds, muito mais bits passaram por alteração, exemplificando
 o processo de difusão do AES.
 
+4.11.1)
+d1 = 1 * (b7*x⁷ + ... + b0) = b7*x⁷ + b6x⁶ + b5*x⁵ + b4*x⁴ + b3*x³ + b2*x² + b1*x + b0
+
+4.11.2)
+d2 = x * (b7*x⁷ + ... + b0) = b7*x⁸ + b6*x⁷ + ... + b0*x
+
+P(x) = x⁸ + x⁴ + x³ + x + 1 ==> x⁸ = x⁴ + x³ + x + 1
+
+d2 = (x⁴ + x³ + x + 1)*b7 + x⁷*b6 + x*b0 =
+   = x⁷*b6 + x⁶*b5 + x⁵*b4 + x⁴*(b3+b7) + x³*(b2+b7) + x² + x(b0+b7) + b7
+
+4.11.3)
+d3 = (x + 1) * (b7*x⁷ + ... + b0) = d1 + d2 = 
+   = x⁷*(b6+b7) + x⁶(b5+b6) + x⁵(b4+b5) + x⁴(b3+b4+b7) + x³(b2+b3+b7) + x²(b1+b2) + x(b0+b1+b7) + b0 + b7
+
+4.12.1)
+Considerando que o enunciado só pergunta sobre as somas
+da multiplicação, temos que:
+- para d1, temos 7 somas, portanto, 7 portas lógicas XOR
+- para d2, temos 10 somas, portanto, 10 portas lógicas XOR
+- para d3, temos 18 somas, portanto, 18 portas lógicas XOR
+
+4.12.2)
+Nessa etapa do AES, temos como resultado um vetor de 4 bytes.
+Cada byte desse resultado depende de 2*d1 + 1*d2 + 1*d3. Para mais,
+temos que d1 necessita de 7 somas, d2 de 10 e d3 de 18, sendo 
+equivalente a um total de 42 somas. Porém, nota-se que a soma 
+entre d1 e d2, por exemplo, não equivale a apenas uma soma, e
+sim a uma soma de polinômios de grau (no máximo) 7, ou seja, 
+8 somas por si só. No total, para cada byte do resultado, necessitamos,
+portanto, de 8*3 + 42 = 66 somas. Como temos 4 bytes para serem 
+gerados, temos um total de 264 somas, ou 264 portas XOR.
+
+4.12.3)
+A camada de difusão é composta pela etapa de ByteSubstitution e pela
+MixColumn. Porém, a primeira é, basicamente, uma permutação em bytes,
+e, como o enunciado assume que permutações não necessitam de portas
+lógicas extras, necessitamos apenas das associadas à segunda etapa.
+Calculamos no exercício anterior que uma parcela dessa etapa para 4
+bytes necessita de 264 portas XOR. Tendo em mente que, para o AES, 
+precisamos de 4 dessas parcelas, nos permitindo chegar a um custo total
+de 1056 portas lógicas XOR.
+
