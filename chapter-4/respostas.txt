@@ -142,3 +142,43 @@ W[7] = W[6] ^ W[3] = E8E9E9E9 ^ FFFFFFFF = 17161616
 Assim:
 Output = 16161616161616161616161616161616 ^ E8E9E9E917161616E8E9E9E917161616
 Output = FEFFFFFF01000000FEFFFFFF01000000
+
+4.10.1) 
+(Utilizando Cryptool)
+Input = 01000000 00000000 00000000 00000000
+Key = 2b7e1516 28aed2a6 abf71588 09cf4f3c
+W[0:3] = 2b7e1516 28aed2a6 abf71588 09cf4f3c
+W[4:7] = a0fafe17 88542cb1 23a33939 2a6c7605
+
+Input Round1 = 2a7e1516 28aed2a6 abf71588 09cf4f3c
+
+Byte Substituion = e5f35947 34e4b524 626859c4 018a84eb
+
+ShiftRows = e5e459eb 34688447 628a5924 01f3b5c4
+
+MixColumn = 54369544 1334863e 3ca2363d 7dfcd4d6
+
+Output = f4cc6b53 9b60aa8f 1f010f04 5790a2d3
+
+4.10.2)
+(Utilizando Cryptool)
+Input = 00000000 00000000 00000000 00000000
+Key = 2b7e1516 28aed2a6 abf71588 09cf4f3c
+W[0:3] = 2b7e1516 28aed2a6 abf71588 09cf4f3c
+W[4:7] = a0fafe17 88542cb1 23a33939 2a6c7605
+
+Input Round1 = 2b7e1516 28aed2a6 abf71588 09cf4f3c
+
+Byte Substituion = f1f35947 34e4b524 626859c4 018a84eb
+
+ShiftRows = f1e459eb 34688447 628a5924 01f3b5c4
+
+MixColumn = 7c228178 1334863e 3ca2363d 7dfcd4d6
+
+Output = dcd87f6f 9b60aa8f 1f010f04 5790a2d3
+
+4.10.3) Nota-se que 32 bits foram alterados, em apenas um round,
+com apenas a mudança de um bit no input. Assim, ao longo dos 
+próximos 9 rounds, muito mais bits passaram por alteração, exemplificando
+o processo de difusão do AES.
+
