@@ -225,3 +225,20 @@ bytes necessita de 264 portas XOR. Tendo em mente que, para o AES,
 precisamos de 4 dessas parcelas, nos permitindo chegar a um custo total
 de 1056 portas lógicas XOR.
 
+4.13.1)
+(29)ₕₑₓ⁻¹ = (0a)ₕₑₓ
+(f3)ₕₑₓ⁻¹ = (34)ₕₑₓ
+(01)ₕₑₓ⁻¹ = (01)ₕₑₓ
+
+4.14.1)
+(29)ₕₑₓ⁻¹ = (0a)ₕₑₓ
+AF(0a) = (1 1 0 0 0 1 1 0) + (0 1 1 0 0 0 1 1) mod2 = (1 0 1 0 0 1 0 1) = S(29)
+
+(f3)ₕₑₓ⁻¹ = (34)ₕₑₓ
+AF(34) = (0 1 1 0 1 1 1 0) + (0 1 1 0 0 0 1 1) mod2 = (0 0 0 0 1 1 0 1) = S(0d)
+
+(01)ₕₑₓ⁻¹ = (01)ₕₑₓ
+AF(01) = (0 0 0 1 1 1 1 1) + (0 1 1 0 0 0 1 1) mod2 = (0 1 1 1 1 1 0 0) = S(01)
+
+4.13.0)
+S(0) = (63)ₕₑₓ
