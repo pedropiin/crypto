@@ -4,15 +4,20 @@ teríamos que o cyphertext de cada record dependeria do de outros,
 resultado esse não muito interessante para o caso, já que temos 
 independência entre cada dado. Assim, o caso ideal seria utilizar
 CTR (Counter Mode), pois não temos interdependência entre os
-dados, podemos paraleliza-los, e o processo de encripção não é
+dados, podemos paraleliza-los, e o processo de encriptação não é
 determinístico.
 
 5.2.1)
 Para quebrar uma cifra em ECB, é necessário apenas um bloco de 
 plaintext-cyphertext, já que tal método não realiza nada além
-da passagem do plaintext pela cifra de bloco. Porém, no pior caso,
-deve-se realizar 2ᵏ operações para quebrar uma cifra de bloco
-em ECB.
+da passagem do plaintext pela cifra de bloco. Assim, nota-se que
+ter o par plaintext/ciphertext não reduz em nada o número de 
+operações necessárias para quebrar a cifra, mas, na verdade, 
+serve como método de verificação da chave. De qualquer jeito 
+o atacante vai ter que realizar 2^k operações, mas com o par 
+em mãos, ele pode checar se a chave encontrada é a chave correta.
+Sem o par, qualquer chave poderia ser válida, e o atacante
+não teria nenhum método de checagem.
 
 5.2.2) 
 Se o IV (Vetor de Inicialização) é conhecido, o atacante necessita
@@ -20,9 +25,52 @@ apenas de um bloco de plaintext/cyphertext para ter uma perspectiva
 de quebrar a cifra com um brute-force. O fato de n > k permite que
 a chave encontrada por um brute-force tenha uma chance ínfima de ser 
 incorreta. Portanto, conhecendo IV e um bloco de plaintext/cyphertext,
-o atacante precisa de 2ᵏ operações para quebrar a cifra. Por mais que
-tal número de operações ainda seja extremamente grande, é muito menor
-do que caso o IV fosse desconhecido, ou não conhecesse nenhum plaintext.
+o atacante precisa de 2ᵏ operações para quebrar a cifra, sendo essas
+operações associadas ao espaço amostral de chaves.
 
 5.2.3)
-?????
+Sem conhecimento do IV (Vetor de Inicialização), o atacante precisaria
+de dois pares plaintext/ciphertext, pois, com o primeiro, mesmo
+sabendo o plaintext, o atacante não saberia a entrada da cifra
+de bloco, já que ela equivale a um XOR com o IV. Então, na iteração
+do segundo par conhecido, ele teria conhecimento de x2, y2 e de x1,
+sendo possível, então, fazer o brute-force de 2^k operações, pois 
+agora se sabe o input e o output da cifra de bloco. Após essa etapa,
+o atacante teria informações suficientes para descobrir o valor de
+IV também.
+
+5.2.4)
+Pode-se afirmar que quebrar uma cifra rodando em CBC é mais difícil
+do que a mesma em ECB, já que ECB por si só é inseguro. Ao descobrir
+a chave, pode-se afirmar que o atacante quebrou a cifra. Já em CBC, 
+o atacante a princípio precisa de mais informações do que ECB, assim
+como explicado acima. Mas para ambos os casos, se usam a mesma cifra
+em bloco, o número de operações necessárias para um brute-force seria
+o mesmo, que, para cifras utilizadas atualmente, é um número irreal
+de operações.
+
+5.3)
+Tendo conhecimento do arquivo automático e de seu conteúdo após ser 
+encriptado, basta fazer o processo inverso, ou seja, decriptar o 
+arquivo, de modo a conseguir o input da cifra de bloco. Sabe-se que 
+o input equivale a um XOR entre o arquivo e o IV. Portanto, basta
+apenas realizar um XOR entre o input e o arquivo para conseguir
+o IV utilizado. 
+Já para o arquivo desconhecido, tem-se conhecimento de seu resultado
+encriptado e da chave. Portanto, basta apenas realizar o processo
+de decriptação padrão de CBC, isto é: xᵢ = eₖ⁻¹(yᵢ)⊕yᵢ₋₁. No último
+caso, já tem-se conhecimento do IV e dos blocos cifrados anteriores,
+sendo, portanto, trivial também.
+
+5.4)
+Para quebrar uma cifra de bloco rodando em OFB, seria necessário
+que o atacante tivesse acesso à dois pares de plaintext/ciphertext.
+Assim, basta fazer o XOR entre x1 e y1 para descobrir o valor dos
+primeiros 128 bits da keystream (supondo AES), ou seja, o primeiro
+bloco gerado pela cifra. Porém, não se tem conhecimento do IV, então,
+consequentemente, o atacante não sabe o input da cifra que gerou
+os 128 bits b em questão. Portanto, ele necessita realizar mais 
+uma iteração do processo, onde, do mesmo modo, utilizando x1 e y2,
+descobre b2. Com isso, agora o atacante tem conhecimento do output 
+b2 e do input b1 da cifra de bloco em questão, restando apenas 
+realizar um ataque brute-force para descobrir as possíveis chaves.
