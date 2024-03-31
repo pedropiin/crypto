@@ -1,0 +1,28 @@
+5.1) 
+Caso usássemos, por exemplo, CBC (Cypher Block Chaining Mode),
+teríamos que o cyphertext de cada record dependeria do de outros, 
+resultado esse não muito interessante para o caso, já que temos 
+independência entre cada dado. Assim, o caso ideal seria utilizar
+CTR (Counter Mode), pois não temos interdependência entre os
+dados, podemos paraleliza-los, e o processo de encripção não é
+determinístico.
+
+5.2.1)
+Para quebrar uma cifra em ECB, é necessário apenas um bloco de 
+plaintext-cyphertext, já que tal método não realiza nada além
+da passagem do plaintext pela cifra de bloco. Porém, no pior caso,
+deve-se realizar 2ᵏ operações para quebrar uma cifra de bloco
+em ECB.
+
+5.2.2) 
+Se o IV (Vetor de Inicialização) é conhecido, o atacante necessita
+apenas de um bloco de plaintext/cyphertext para ter uma perspectiva 
+de quebrar a cifra com um brute-force. O fato de n > k permite que
+a chave encontrada por um brute-force tenha uma chance ínfima de ser 
+incorreta. Portanto, conhecendo IV e um bloco de plaintext/cyphertext,
+o atacante precisa de 2ᵏ operações para quebrar a cifra. Por mais que
+tal número de operações ainda seja extremamente grande, é muito menor
+do que caso o IV fosse desconhecido, ou não conhecesse nenhum plaintext.
+
+5.2.3)
+?????
