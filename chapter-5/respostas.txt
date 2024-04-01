@@ -74,3 +74,29 @@ uma iteração do processo, onde, do mesmo modo, utilizando x1 e y2,
 descobre b2. Com isso, agora o atacante tem conhecimento do output 
 b2 e do input b1 da cifra de bloco em questão, restando apenas 
 realizar um ataque brute-force para descobrir as possíveis chaves.
+
+5.5)
+Caso o IV não altere para cada execução da encriptação, temos que
+a key stream será sempre a mesma, já que o mesmo IV gera um certo 
+s0, que, por sua vez, será usado como input para gerar o s1, e 
+segue o ciclo. Assim, com o mesmo IV, todos os inputs de todas as
+iterações será exatamente o mesmo. Assim, qualquer cifra de bloco
+rodando em OFB se torna determinística, isto é, um mesmo plaintext
+será sempre encriptado da mesma forma, gerando o mesmo ciphertext.
+Assim, caso o atacante não conheça nenhum par plaintext/ciphertext,
+os ataques que ele pode fazer são os do mesmo tipo que os exemplos
+do livro para ECB, isto é, envolvendo alteração de informações
+no próprio ciphertext. Caso ele tenha conhecimento de, por exemplo,
+um par, torna-se trivial descobrir um bloco da key stream.
+
+5.6)
+Considerando que o apertar de uma tecla represente um byte, podemos
+iniciar o processo escolhendo um IV aleatório para a cifra. Assim, 
+passamos-lhe pela cifra de bloco e, do output, selecionamos apenas
+o byte mais significativo, isto é, aquele mais à esquerda. Com ele,
+realizamos um XOR com byte proveniente do teclado para gerarmos o 
+ciphertext, isto é, o valor do teclado encriptado. Como próximo 
+input da cifra de bloco, uma estratégia interessante seria realizar
+um shift para a esquerda de 1 byte no output da cifra de bloco,
+e colocar o byte selecionado na iteração anterior nas posições menos
+significativas, gerando um IV novo.
