@@ -162,3 +162,51 @@ resumindo, nesse caso, ocorrerá dois tipos de erros: os diretamente
 relacionados à entrada da cifra e os relacionados ao sistema de feedback 
 do modo utilizado.
 
+## 5.11)
+Anteriormente ao erro, a entrada da cifra era do formato 
+xᵢ xᵢ₊₁ xᵢ₊₂ ... xᵢ₊₁₂₇. 
+Normalmente, na próxima iteração, o bit encriptado seria adicionado após
+um shift para a esquerda da entrada acima, assumindo a forma
+xᵢ₊₁ xᵢ₊₂ xᵢ₊₃ ... xᵢ₊₁₂₇ yᵢ
+No entanto, com a inserção de um bit errado em alguma iteração futura, 
+tem-se que essa entrada ficaria como
+xᵢ₊₃ ... xᵢ₊₁₂₇ yᵢ yᵢ₊₂ z
+No entanto, nota-se que com a continuação da encriptação, o sistema de 
+feedback continuará adicionando novos bits na entrada da cifra. Como tal
+entrada, no caso do AES, tem 128 bits, o bit indesejado demoraria 127 
+iterações para chegar à posição de bit mais significante, e, consequentemente,
+mais uma iteração seguinte para deixar de existir no input. Portanto,
+reconhece-se que ocorrerão 129 iterações para que o sistema voltasse
+ao funcionamento desejado (1 iteração inicial de inserção do erro e outras
+128 para que passasse por todas as posições através de shifts e "saísse"
+do vetor).
+
+## 5.12.1)
+Um IC custa $5 e checa 10⁷ chaves por segundo. Para mais, sabe-se que 
+DES utiliza uma chave de 56 bits. Portanto, para um brute-force de uma 
+dupla encriptação, é necessário realizar 2¹¹² possibilidades.
+10⁷ ≈ 2²⁴ ==> 2¹¹² / 2²⁴ = 2⁸⁸ segundos
+Em uma semana, temos 60 * 60 * 24 * 7 = 604800 segundos
+Portanto, seria necessário construir 2⁸⁸ / 604800 ≈ 5 * 10²⁰ IC's
+Isso implicaria em um custo de 5 * 10²⁰ * 5 = 2,5 * 10²¹ dólares
+Com um overhead de 50%, teríamos um custo de $3,75 * 10²¹
+
+## 5.12.2)
+Para realizar um ataque meet-in-the middle em uma DES, seria necessário
+2⁵⁶ entradas na memória para registrar possíveis combinações de chaves
+e ciphertexts gerados por elas. Como cada chave e bloco de ciphertext
+tem 56 e 64 bits de tamanho, respectivamente, cada uma dessas entradas 
+ocuparia 120 bits de armazenamento, ou seja, 15 bytes.
+Assim, seguindo um raciocínio semelhante, em um meet-in-the-middle attack,
+o atacante precisa realizar 2ᵏ⁺¹ operações, ou seja, 2⁵⁷ operações. Com
+o mesmo sistema da questão anterior, temos:
+2⁵⁷ / 2²⁴ = 2³³ segundos em uma máquina. Em uma semana: 
+2³³ / 604800 ≈ 14200 IC's ==> 5 * 14200 = $71000. Com o overhead, o custo
+ficaria em $106500.
+Agora, para o armazenamento utilizado ao longo desse ataque, o custo 
+associado seria
+2⁵⁶ entradas * 15 bytes/entrada = 1,1 * 10¹⁸ bytes
+1GByte = 10⁹ bytes ==> 1,1 * 10¹⁸ / 10⁹ = 1,1 * 10⁹ GBytes.
+Custo = 8 * 1,1 * 10⁹ / 10 = 8,8 * 10⁸ dólares.
+Portanto, o custo de um meet-in-the-middle attack seria aproximadamente
+$8,8*10⁸, ou seja, 4,21 * 10¹² vezes mais barato que um brute-force.
