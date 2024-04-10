@@ -1,72 +1,6 @@
-ECB (Eletronic Codebook Mode):
---> Modo intuitivo de encriptação: passar todos os plaintexts, 
-    um seguido do outro, pela cifra em bloco. Decriptação é
-    basicamente o processo reverso
---> Determinístico e facilmente manipulável.
+# Respostas
 
-CBC (Cipher Block Chaining Mode):
---> A ideia é que todos os blocos de ciphertexts dependam do 
-    plaintext associado e, também, de outros ciphertexts encriptados
-    anteriormente. Para isso, o ciphertext yᵢ₋₁ é utilizado em 
-    uma operação de XOR com o plaintext de entrada xᵢ. Em seguida,
-    na próxima iteração, o input é um XOR entre o ciphertext gerado
-    na iteração passada yᵢ com o plaintext xᵢ₊₁. Assim, um bloco yₖ 
-    depende tanto do xₖ quanto de todos os outros yₖ₋ₙ anteriores.
---> Necessita de um IV (Initialization Vector) para a primeira 
-    iteração
---> Decriptação é, novamente, o processo reverso, ou seja:
-    xᵢ = eₖ⁻¹(yᵢ) XOR yᵢ₋₁
---> Não determinístico desde que IV seja um nonce.
---> IV não precisa ser secreto.
-
-OFB (Output Feedback Mode):
---> Raciocínio semelhante ao de CBC, porém simula uma cifra de 
-    fluxo. Dessa vez, o que é passado pela cifra de bloco é o 
-    seu próprio output da iteração anterior. Assim, o output
-    da cifra sᵢ passa por um XOR com o plaintext xᵢ da iteração,
-    realizando de fato a encriptação do processo.
---> Na primeira iteração também necessita de um IV
---> Não é determinístico, desde que o IV seja um nonce, ou seja
-    seja usado apenas uma vez para cada encriptação.
---> Nota-se que a encriptação (XOR com plaintext) é independente
-    das passagens pela cifra de bloco. Assim, os outputs da cifra
-    de bloco podem ser calculados previamente, de modo a agilizar
-    o processo.
-
-CFB (Cipher Feedback Mode):
---> Semelhante ao OFB, porém, ao invés de passar o output sᵢ da 
-    cifra como input da próxima iteração, o próprio ciphertext 
-    yᵢ é passado como entrada. O restante do processo funciona
-    semelhantemente ao OFB.
---> Não determinístico
---> Necessita de um IV nonce.
-
-CTR (Counter Mode):
---> Funcionamento simples, em que o output da cifra de bloco 
-    realiza um XOR com o plaintext da iteração. No entanto, a 
-    diferença está na entrada da cifra de bloco. Aqui, parte do
-    IV (por exemplo, 1/4 dos bits) é um contador, que, para 
-    cada iteração, é incrementado, mantendo o restante do IV 
-    constante.
---> Utilizando AES com um contador de 32 bits, temos que a entrada
-    envolve 96 bits do IV e 32 bits do contador. Assim, é possível
-    realizar 2³² encriptações em bloco antes de ser necessário trocar
-    o IV. Como o bloco tem 8 bytes, nesse caso, pode-se encriptar
-    2³⁵ bytes (32 Gigabytes) antes da troca.
---> O IV, juntamente ao Counter não precisa ser secreto
---> O counter pode ser simples, começando no 0 e sendo incrementado 
-    em 1 a cada iteração, por exemplo; ou pode ser implementado
-    de forma mais complexa, utilizando registrados de shift, por 
-    exemplo.
---> Pode ser paralelizado, pois uma iteração não depende de outras.
-    Assim, podemos ter, por exemplo, duas cifras de bloco, uma para
-    as iterações pares, e outra para as iterações ímpares.
-
-GCM (Galois Counter Mode):
---> Modo um pouco mais complexo, mas que permite a geração de um
-    MAC juntamente à encriptação.
-
-5.1) 
+## 5.1) 
 Caso usássemos, por exemplo, CBC (Cypher Block Chaining Mode),
 teríamos que o cyphertext de cada record dependeria do de outros, 
 resultado esse não muito interessante para o caso, já que temos 
@@ -75,7 +9,7 @@ CTR (Counter Mode), pois não temos interdependência entre os
 dados, podemos paraleliza-los, e o processo de encriptação não é
 determinístico.
 
-5.2.1)
+## 5.2.1)
 Para quebrar uma cifra em ECB, é necessário apenas um bloco de 
 plaintext-cyphertext, já que tal método não realiza nada além
 da passagem do plaintext pela cifra de bloco. Assim, nota-se que
@@ -87,7 +21,7 @@ em mãos, ele pode checar se a chave encontrada é a chave correta.
 Sem o par, qualquer chave poderia ser válida, e o atacante
 não teria nenhum método de checagem.
 
-5.2.2) 
+## .2.2) 
 Se o IV (Vetor de Inicialização) é conhecido, o atacante necessita
 apenas de um bloco de plaintext/cyphertext para ter uma perspectiva 
 de quebrar a cifra com um brute-force. O fato de n > k permite que
@@ -96,7 +30,7 @@ incorreta. Portanto, conhecendo IV e um bloco de plaintext/cyphertext,
 o atacante precisa de 2ᵏ operações para quebrar a cifra, sendo essas
 operações associadas ao espaço amostral de chaves.
 
-5.2.3)
+## 5.2.3)
 Sem conhecimento do IV (Vetor de Inicialização), o atacante precisaria
 de dois pares plaintext/ciphertext, pois, com o primeiro, mesmo
 sabendo o plaintext, o atacante não saberia a entrada da cifra
@@ -107,7 +41,7 @@ agora se sabe o input e o output da cifra de bloco. Após essa etapa,
 o atacante teria informações suficientes para descobrir o valor de
 IV também.
 
-5.2.4)
+## 5.2.4)
 Pode-se afirmar que quebrar uma cifra rodando em CBC é mais difícil
 do que a mesma em ECB, já que ECB por si só é inseguro. Ao descobrir
 a chave, pode-se afirmar que o atacante quebrou a cifra. Já em CBC, 
@@ -117,7 +51,7 @@ em bloco, o número de operações necessárias para um brute-force seria
 o mesmo, que, para cifras utilizadas atualmente, é um número irreal
 de operações.
 
-5.3)
+## 5.3)
 Tendo conhecimento do arquivo automático e de seu conteúdo após ser 
 encriptado, basta fazer o processo inverso, ou seja, decriptar o 
 arquivo, de modo a conseguir o input da cifra de bloco. Sabe-se que 
@@ -130,7 +64,7 @@ de decriptação padrão de CBC, isto é: xᵢ = eₖ⁻¹(yᵢ)⊕yᵢ₋₁. N
 caso, já tem-se conhecimento do IV e dos blocos cifrados anteriores,
 sendo, portanto, trivial também.
 
-5.4)
+## 5.4)
 Para quebrar uma cifra de bloco rodando em OFB, seria necessário
 que o atacante tivesse acesso à dois pares de plaintext/ciphertext.
 Assim, basta fazer o XOR entre x1 e y1 para descobrir o valor dos
@@ -143,7 +77,7 @@ descobre b2. Com isso, agora o atacante tem conhecimento do output
 b2 e do input b1 da cifra de bloco em questão, restando apenas 
 realizar um ataque brute-force para descobrir as possíveis chaves.
 
-5.5)
+## 5.5)
 Caso o IV não altere para cada execução da encriptação, temos que
 a key stream será sempre a mesma, já que o mesmo IV gera um certo 
 s0, que, por sua vez, será usado como input para gerar o s1, e 
@@ -157,7 +91,7 @@ do livro para ECB, isto é, envolvendo alteração de informações
 no próprio ciphertext. Caso ele tenha conhecimento de, por exemplo,
 um par, torna-se trivial descobrir um bloco da key stream.
 
-5.6)
+## 5.6)
 Considerando que o apertar de uma tecla represente um byte, podemos
 iniciar o processo escolhendo um IV aleatório para a cifra. Assim, 
 passamos-lhe pela cifra de bloco e, do output, selecionamos apenas
@@ -169,7 +103,8 @@ um shift para a esquerda de 1 byte no output da cifra de bloco,
 e colocar o byte selecionado na iteração anterior nas posições menos
 significativas, gerando um IV novo.
 
-5.7.2) Tal método de encriptação é extremamente fraco, pois a entrada
+## 5.7.2) 
+Tal método de encriptação é extremamente fraco, pois a entrada
 da cifra de bloco sempre terá apenas 8 bits variando, implicando em
 256 possibilidades de entrada, mesmo com o bloco sendo de 128 bits.
 Assim, nota-se que o output da cifra entrará em um ciclo muito cedo,
@@ -182,15 +117,48 @@ arquivo de 100kBytes, muitas das iterações vão ter chaves repetidas.
 Por fim, se um atacante tem conhecimento de 2kBytes do plaintext 
 (equivalente a 256 blocos), ele consegue quebrar o esquema.
 
-5.7.3) O esquema não fica mais seguro, já que ainda sim ele disponibiliza
+## 5.7.3) 
+O esquema não fica mais seguro, já que ainda sim ele disponibiliza
 apenas 256 possibilidades de bytes de feedback FB. Assim, por mais que
 os bytes restantes não sejam iguais a zero, são apenas uma repetição,
 característica essa que não influencia em nada no aumento da segurança.
 
-5.9) 1TB = 1024 GB = 2¹⁰ GB = 2⁴⁰ Bytes
+## 5.9) 1TB = 1024 GB = 2¹⁰ GB = 2⁴⁰ Bytes
 Portanto, o tamanho máximo do IV é de 88 bits, ou 11 Bytes, já que 
 se utilizasse um bit a mais, por exemplo, o contador não conseguiria
 atingir 1TB, sendo necessário repetir números, e, portanto, poderia 
 haver chaves repetidas no processo de encriptação.
 
-5.10) 
+## 5.10.1) 
+Se a encriptação e a decriptação forem feitas usando ECB, Bob terá 
+problemas apenas no entendimento do plaintext xᵢ relacionado ao bloco
+cifrado yᵢ em questão. Isso se deve ao fato de que ECB não relaciona
+iterações do processo de encriptação. Portanto, cada bloco é independente.
+
+## 5.10.2)
+Diferentemente, ao utilizar CBC, todos os blocos de plaintext encriptados
+após yᵢ são afetados, devido à propriedade de feedback do modo em 
+questão. Assim, caso i = 1, por exemplo, todos menos o primeiro bloco
+de texto seriam encriptados com um erro.
+
+## 5.10.3)
+Assim como caso o erro ocorresse no bloco cifrado, o erro será disperso
+para os blocos seguintes. A única diferença nesse caso, isto é, quando 
+o erro ocorre no plaintext, todos os blocos cifrados serão afetados 
+em grande quantidade, devido a propriedade de difusão. Já quando o
+erro aparece no ciphertext, apenas os próximos blocos encriptados terão
+grandes alterações, enquanto o bloco da iteração em questão terá apenas
+um bit alterado.
+
+## 5.10.4)
+Utilizando CFB no modo de 8 bits, temos que, no caso do AES, o erro será
+propagado no input da cifra de bloco ao longo de 16 iterações, pois o 
+byte continuará no input, mudando apenas de posição através dos shifts
+para a esquerda. Nas iterações seguintes, por mais que o byte alterado
+não esteja mais no input diretamente, os outputs gerados por ele terão
+em si seus respectivos erros difundidos, já que são frutos de uma 
+encriptação ou decriptação utilizando uma entrada adulterada. Então, 
+resumindo, nesse caso, ocorrerá dois tipos de erros: os diretamente 
+relacionados à entrada da cifra e os relacionados ao sistema de feedback 
+do modo utilizado.
+
