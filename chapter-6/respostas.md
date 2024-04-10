@@ -42,5 +42,7 @@ necessário (no exemplo, passa de 1.3ms para 5.2ms). Para mais,
 RSA-1024 para 15360 é o mesmo que ECC-160 para 512. Assim, deixa
 de demorar 1.3ms e passa a levar 42.6ms.
 
-## 6.5.1)
+## 6.5.1 - 6.10
+// Feitos na mão no caderno, pois são exercícios ariméticos.
+
 
