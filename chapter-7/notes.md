@@ -30,7 +30,7 @@
         - Realizar a potenciação de um número x por um 
             expoente 'e' com comprimento igual a 1024 bits
             necessitaria de 10³⁰⁰ multiplicações. Com o método acima, apenas 1,5t, onde t é o comprimento
-            em nits do expoente.
+            em bits do expoente.
 
 - Ainda sim, RSA é muito custoso e demorado.
     - Para acelerar a encriptação, é comum utilizarem 

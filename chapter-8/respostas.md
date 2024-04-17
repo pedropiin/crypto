@@ -10,7 +10,7 @@ ord(a)| 1 | 3 | 6 | 3 | 6 | 2
 
 ## 8.1.3)
 a     | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-ord(a)| 1 | 12| 3 | 6 | 4 | 12| 12| 4 | 3 |  6 | 12 | 2]
+ord(a)| 1 | 12| 3 | 6 | 4 | 12| 12| 4 | 3 |  6 | 12 | 2 
 
 ## 8.2) 
 Sabemos que para todo a ε G, ord(a) | |G|. Desse modo, podemos afirmar
@@ -99,3 +99,40 @@ Consequentemente, o atacante teria fácil acesso à chave comum
 privada.
 
 ## 8.8.1)
+O valor máximo para as chaves privadas equivale a 2¹⁶⁰ - 1, visto
+que a ordem do subgrupo gerado por α é 2¹⁶⁰. Assim, toda chave
+privada selecionada no intervalo em questão resultará em uma
+potência diferente de α.
+
+## 8.8.2)
+Pelo método otimizado explicado pelo livro, a partir da chave 
+de máscara, Alice e Bob precisam apenas de uma operação de 
+exponenciação para calcular a chave de sessão privada. Alice precisa
+realizar βⁱ, e Bob precisa calcular Kₑᵈ. Supondo que ambas chaves
+privadas possuem tamanho de 160 bits, utilizando o algoritmo
+eficiente de square-and-multiply, ambas operações levariam 160
+potenciações e 80 multiplicações, resultando em um tempo de 
+700 * 160 + 400 * 80 = 144000 μs = 0,144 s.
+
+## 8.8.3)
+Por mais que α agora seja um valor pequeno, não necessariamente
+o subgrupo ao qual ele é gerador será menor. O subgrupo pode ser
+de tamanho igual ou até maior. Com isso e com os dados do enunciado,
+sabe-se que o cálculo da chave da sessão agora demoraria aproximadaemente
+30 * 160 + 400 * 80 = 36800 μs = 0,0368 s.
+Com o algoritmo de square-and-multiply, reduzir o valor de α faz com que
+um dos fatores das multiplicaçãoes, isto é, o α, seja menor, sendo,
+portanto, um processo menos custoso de ser realizado. Já a exponenciação,
+mesmo que α seja um valor menor, a chave privada 'i' utilizada como
+expoente não necessariamente diminui, fazendo com que a exponenciação 
+se mantenha basicamente a mesma operação em mod p.
+
+## 8.9.1)
+Se a = p - 1 em Zₚ, a² = (p - 1)*(p-1) = p² - 2p + 1 ≡ 1 mod p
+
+## 8.9.2)
+Se a = p - 1 em Zₚ, temos que ord(a) = 2. Consequentemente, a é
+gerador de um subgrupo H, tal que card(H) = 2 e H = {1, a}
+
+## 8.9.3)
+

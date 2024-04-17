@@ -28,6 +28,6 @@ def find_primitives(mod):
     return primitives
 
 if __name__ == "__main__":
-    mod = 4969
+    mod = 11
     primitives = find_primitives(mod)
     print(primitives)
