@@ -118,7 +118,7 @@ potenciações e 80 multiplicações, resultando em um tempo de
 Por mais que α agora seja um valor pequeno, não necessariamente
 o subgrupo ao qual ele é gerador será menor. O subgrupo pode ser
 de tamanho igual ou até maior. Com isso e com os dados do enunciado,
-sabe-se que o cálculo da chave da sessão agora demoraria aproximadaemente
+sabe-se que o cálculo da chave da sessão agora demoraria aproximadamente
 30 * 160 + 400 * 80 = 36800 μs = 0,0368 s.
 Com o algoritmo de square-and-multiply, reduzir o valor de α faz com que
 um dos fatores das multiplicaçãoes, isto é, o α, seja menor, sendo,
@@ -135,4 +135,10 @@ Se a = p - 1 em Zₚ, temos que ord(a) = 2. Consequentemente, a é
 gerador de um subgrupo H, tal que card(H) = 2 e H = {1, a}
 
 ## 8.9.3)
-
+Já foi provado em exercícios anteriores a fraqueza de chaves privadas
+com valor igual a 1 ou igual a p - 1. Então, tal subgrupo por si só
+já apresenta uma fraqueza inerente. Para mais, pelo fato de ter apenas 2 
+possibilidades de chaves, um DHKE implementado como schoolbook nesse subgrupo
+seria determinístico sob 2 chaves diferentes. Ou seja, caso Alice tentasse
+encriptar a mesma mensagem 3 vezes, qualquer atacante conseguiria quebrar
+o esquema, pois reconheceria a repetição de uma das chaves.
