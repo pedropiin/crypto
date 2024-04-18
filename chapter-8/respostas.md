@@ -142,3 +142,31 @@ possibilidades de chaves, um DHKE implementado como schoolbook nesse subgrupo
 seria determinístico sob 2 chaves diferentes. Ou seja, caso Alice tentasse
 encriptar a mesma mensagem 3 vezes, qualquer atacante conseguiria quebrar
 o esquema, pois reconheceria a repetição de uma das chaves.
+
+## 8.10)
+α = x², a = 3, b = 12, P(x) = x⁵ + x² + 1
+∴ A = αᵃ = x⁶ ≡ x³ + x e B = α¹² = x⁴ + x² + x
+∴ Kₐ = Aᵇ = Bᵃ = (x⁴ + x² + x)³ = x¹² + 3x¹⁰ + 3x⁹ + 3x⁸ + 6x⁷ + 4x⁶ + 3x⁵ + 3x⁴ + x³ =
+= x¹² + x¹⁰ + x⁹ + x⁸ + x⁵ + x⁴ + x³ = 
+= x³ + x + 1
+
+## 8.11)
+Se Oscar consegue manipular as mensagens e informações trocadas por
+Alice e Bob, basta alterar o valor de uma das chaves públicas das partes
+envolvidas. Alterando, por exemplo, a mensagem que envia a chave pública
+'B' de Bob para Alice, esta não conseguirá calcular a chave da sessão, já
+que realizaria Bᵃ, e, como a base está adulterada, o resultado não será
+o mesmo que o calculado por Bob com Aᵇ.
+
+## 8.13.1)
+Dados:
+p = 467, α = 2, d = 105, i = 213, x = 33
+Cálculo das chaves públicas:
+Kₑ = αⁱ = 2²¹³ mod 467 = 29
+β = αᵈ = 2¹⁰⁵ mod 467 = 444
+Encriptação:
+Kₘ = βⁱ = 444²¹³ mod 467 = 292
+y = x * Kₘ = 33 * 292 mod 467 = 296
+Decriptação:
+Kₘ⁻¹ = Kₑᵖ⁻ᵈ⁻¹ = 29⁴⁶⁷⁻¹⁰⁵⁻¹ mod 467 = 29³⁶¹ mod 467 = 8
+x = y * Kₘ⁻¹ = 296 * 8 mod 467 = 33
