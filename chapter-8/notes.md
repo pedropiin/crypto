@@ -1,4 +1,4 @@
-# Notes
+# Public-Key Cryptosystems Based on the Discrete Logarithm Problem
 - Diffie-Hellman Key Exchange (DHKE)
     - Método para estabelecimento de chaves seguras em 
     um canal não seguro
@@ -107,10 +107,14 @@
             - A chave pública calculada por Alice kₑ e o elemento 'i' devem
             ser utilizados apenas uma vez por encriptação, pois, caso 
             contrário, o esquema se torna determinístico. 
-        - Ao invés de calcular kₘ = kᵈ mod p para depois calcular a inversão
+        - Ao invés de calcular kₘ = kₑᵈ mod p para depois calcular a inversão
         kₘ⁻¹, Bob, aritméticamente, sabe que kₘ⁻¹ = kₑᵖ⁻ᵈ⁻¹
     - Caso os parâmetros sejam selecionados corretamente, é impossível
     de ser quebrado. Caso contrário, um brute-force é possível. Para mais,
     se 'i' e kₑ não são únicos, se torna determinístico.
+        - Primo p deve ter no mínimo 1024 bits de tamanho para garantir 
+        segurança de 80 bits, e 3072 para segurança de 128 bits. Para mais,
+        o menor fator primo de p - 1 deve ter no mínimo 160 e 256 bits de
+        tamanho para um nível de segurança respectivo.
     - É maleável, portanto Elgamal schoolbook não é comumente implementado.
     Para solucionar, usam padding assim como em RSA.

@@ -1,4 +1,4 @@
-# Notes
+# More About Block Ciphers
 ECB (Eletronic Codebook Mode):
 - Modo intuitivo de encriptação: passar todos os plaintexts, 
     um seguido do outro, pela cifra em bloco. Decriptação é

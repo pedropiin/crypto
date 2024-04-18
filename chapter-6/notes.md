@@ -1,4 +1,4 @@
-# Notes
+# Introduction to Public-Key Crytography
 - Criptografia simétrica é rápida e segura, porém possui
     problemas:
     - Distribuição de chaves de forma segura entre ambas 
