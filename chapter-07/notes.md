@@ -56,7 +56,9 @@ primalidade de Miller-Rabin
     número, de modo a diminuir as chances do número
     ser um número composto e o teste apresente como 
     saída um falso positivo.
+
 ![](./assets/miller-rabin.png)
+
 ![](./assets/miller-rabin-algorithm.png)
 
 - RSA, se implementado apenas como apresentado acima, 
