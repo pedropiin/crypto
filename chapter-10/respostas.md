@@ -116,3 +116,45 @@ s = (x - d * r) * kₑ⁻¹ mod p - 1 = (17 - 67 * 87) * 31 mod 96 = 20
 t = βʳ * rˢ mod p = 15⁸⁷ * 87²⁰ mod 97 = 68
 αˣ mod p = 23¹⁷ mod 97 = 68 = t
 Portanto, segue o esquema.
+
+## 10.10.2)
+1:
+t = βʳ * rˢ mod p = 15³⁷ * 37³³ mod 97 = 49
+αˣ mod p = 23²² mod 97 = 49
+∴, a mensagem provém de Bob
+
+2:
+t = βʳ * rˢ mod p = 15¹³ * 13⁶⁵ mod 97 = 54
+αˣ mod p = 23⁸² mod 97 = 32
+∴, a mensagem não provém de Bob.
+
+## 10.10.3)
+A assinatura digital baseada em RSA possui algumas vantagens em relação à 
+baseada em Elgamal. A principal e mais relevante é a velocidade, já que 
+envolve menos operações de exponenciação, e, portanto, menos operações de
+multiplicação e potenciação. A verificação por si só fica ainda mais rápida
+caso o expoente público 'e' escolhido seja pequeno. Além disso, a etapa de 
+geração de chaves do Elgamal é bem mais demorada e complexa, pois aleḿ de um
+primo muito grande, é necessário encontrar um corpo finito juntamente a seu
+gerador. Já para RSA, basta encontrar dois primos de "meio tamanho". 
+Para mais, ela possui uma fraqueza a menos quando ambas implementadas no estilo 
+"schoolbook", já que não depende da efemeridade de uma chave aleatória. 
+Em Elgamal, caso a chave pública efêmera kₑ seja repetida, um atacante 
+consegue bquebrar sem esforço todo o esquema. 
+Por último, RSA permite que mensagens sejam enviadas juntamente à assinatura, 
+muitas vezes com uma "misturada" na outra, já que suas propriedades garantem a 
+validade da recuperação da mensagem. Já em Elgamal, a utilização de uma 
+função de hashing é intrínseca à seu funcionamento, característica essa que
+impede que o receptor recupere a mensagem 100% das vezes a partir do hashing
+Portanto, é necessário que a mensagem seja concatenada à assinatura.
+
+## 10.12)
+p = 97, α = 23, β = 15
+Seja j = 37 e i = 64. Válidos, pois gcd(j, p - 1) = gcd(37, 96) = 1
+r = αⁱ*βʲ mod p = 23⁶⁴ * 15³⁷ mod 97 = 59
+s = -r * j⁻¹ mod 96 = -59 * 13 mod 96 = 1
+x = s * i mod 96 = 64
+
+## 10.13)
+// Por resolução feita na mão, tem-se que o resultado é a fórmula a seguir:
+d = (x₁ - s₁ * (x₁ - x₂ + s₂) / (s₁ - s₂)) / r mod p - 1
