@@ -170,3 +170,21 @@ y = x * Kₘ = 33 * 292 mod 467 = 296
 Decriptação:
 Kₘ⁻¹ = Kₑᵖ⁻ᵈ⁻¹ = 29⁴⁶⁷⁻¹⁰⁵⁻¹ mod 467 = 29³⁶¹ mod 467 = 8
 x = y * Kₘ⁻¹ = 296 * 8 mod 467 = 33
+
+## 8.14)
+Dados:
+p = 31, α = 3, β = 18, Kₑ₁ = Kₑ₂ = 6, y1 = 17, y2 = 25
+Por brute-force, temos que
+d = 26
+Consequentemente:
+Kₘ⁻¹ = Kₑᵖ⁻ᵈ⁻¹ mod p = 6³¹⁻²⁶⁻¹ mod 31 = 6⁴ mod 31 = 25
+x1 = y1 * Kₘ⁻¹ mod p = 17 * 25 mod 31 = 22
+x2 = y2 * Kₘ⁻¹ mod p = 25 * 25 mod 31 = 5
+
+## 8.18.1)
+ord(β) = ord(28) mod 29 = 1
+
+## 8.18.2)
+Com ord(β) = 1, só existe uma chave de máscara possível: 1. Isso se deve
+ao fato de que qualquer exponenciação de β sobre mod29 por qualquer chave
+privada
