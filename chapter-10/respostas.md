@@ -158,3 +158,18 @@ x = s * i mod 96 = 64
 ## 10.13)
 // Por resolução feita na mão, tem-se que o resultado é a fórmula a seguir:
 d = (x₁ - s₁ * (x₁ - x₂ + s₂) / (s₁ - s₂)) / r mod p - 1
+
+## 10.14.1)
+Dados:
+p = 59, q = 29, α = 3, d = 23, h(x) = 17, kₑ = 25
+Geração de chaves:
+β = αᵈ mod p = 3²³ mod 59 = 45
+Assinatura:
+r = (αᵏₑ mod p) mod q = (3²⁵ mod 59) mod 29 = 22
+s = (h(x) + d * r) * kₑ⁻¹ mod q = (17 + 23 * 22) * 7 mod 29 = 7
+Verificação:
+w = s⁻¹ mod q = 7⁻¹ mod 29 = 25
+u1 = w * h(x) mod q = 25 * 17 % 29 = 19
+u2 = w * r mod q = 25 * 22 mod 29 = 28
+v = (αᶸ¹ * βᶸ² mod p) mod q = (3¹⁹ * 45²⁸ mod 59) mod 29 = 11
+Sei la o que fiz de errado :)
