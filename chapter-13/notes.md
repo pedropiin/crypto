@@ -141,4 +141,85 @@ Simétrica
             consegue editá-la antes de enviar para Bob, 
             demonstrando ainda mais o potencial de tal 
             ataque.
-        
+    - Certificados
+        - Man-in-the-middle attack só é possível porque
+        as chaves públicas não são autenticadas. A solução
+        é utilizar certificados, que fazem uso de assinaturas
+        digitais para garantir autenticação.
+            - MACs também garantem autenticação, porém
+            dependem de criptografia simétrica, e, portanto,
+            precisariam de um canal seguro para a transmissão
+            das chaves.
+            - Certₐ = [(kₚᵤ,ₐ, IDₐ), sigₖₚᵣ(kₚᵤ,ₐ, IDₐ)]
+        - Verificar a assinatura digital do certificado 
+        necessita também de uma chave pública. Assim, 
+        utilizar a chave de um dos envolvidos nas trocas
+        de mensagens só voltaria para o problema inicial.
+        - A solução é terceirizar a confiança para CAs, 
+        i.e., Certification Authority.
+            ![]("./assets/dhke-certificate.png")
+            - O remetente pode gerar suas próprias chaves
+            e solicitar o certificado para o CA, ou fazer
+            com que o CA realize todo o processo, isto é,
+            gere as chaves e crie o certificado em cima 
+            delas.
+                - O request para o certificado deve ser
+                feito em um canal autenticado, para que 
+                o CA tenha garantia de que o pedido foi 
+                de fato enviado pelo remetente ao qual as
+                chaves estão associadas.
+                - O envio do certificado (e da chave) deve
+                ser feito também em um canal autenticado
+                e seguro, já que envolve a transmissão
+                de informações sensíveis.
+            - A verificação dos certificados envolve as 
+            chaves públicas dos próprios CAs. Assim, o 
+            problema é mais facilmente resolvido já que
+            tais chaves podem e, na prática, são obtidas
+            através de canais seguros na etapa de configuração
+                - Maioria dos browsers atualmente já 
+                são instalados juntamente à chaves públicas 
+                de CAs
+        - PKI (Public-Key Infrastructures): 
+            - Sistema composto pelos CAs e mecanismos 
+            associados
+            - Um dos principais padrões de certificados
+            utilizados atualmente é o X.509
+            ![]("./assets/x509.png")
+                - Nota-se que todo certificado está 
+                associado à dois algoritmos de chave 
+                pública, e, portanto, à duas chaves.
+                    - Chave pública que o certificado
+                    autentica e chave pública para 
+                    verificação do certificado.
+            - Chain of CAs ou Chain of Trust
+                - Na prática existem muitos CAs, e não
+                necessariamente um usuário possui as 
+                chaves de verificação de todos
+                    - Muitos países, empresas, entre
+                    outros grupos possuem seus próprios
+                    CAs
+                - Portanto, na prática, CAs verificam 
+                outros CAs. Assim, se Alice tem a chave
+                de CA1 e deseja se comunicar com Bob, 
+                associado ao CA2, precisa realizar um 
+                request ao CA2 para obter sua chave pública
+                assinado por CA1. Após isso, tem acesso
+                a chave pública de CA2 e consegue obter
+                acesso à chave pública de Bob.
+            - Certificate Revocation Lists (CRLs)
+                - Quando um usuário deixar de fazer parte
+                de uma rede (e.g. um funcionário que saiu
+                de uma empresa), busca-se desligá-lo do
+                sistema para que não continua tendo acesso
+                às informações internas. Assim, CRLs passam
+                números de séries de certificados que devem
+                ser desligados / ignorados.
+                    - Problemático, pois ou atualizações
+                    são realizadas apenas de vez em quando,
+                    diminuindo a segurança do sistema, pois
+                    um usuário teria o espaço e o tempo entre
+                    atualizações para tirar proveito de um
+                    certificado revogado; ou são feitas 
+                    frequentemente, implicando em um peso 
+                    enorme na bandwidth da rede.
