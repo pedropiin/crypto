@@ -60,7 +60,7 @@ da assinatura seja muito grande.
                 final, etc.
                     - Se tem 64 posições para editar, possui 2⁶⁴ casos.
         - Pelo paradoxo do aniversário, são necessárias apenas 2ⁿ/² 
-        operaçõespara encontrar uma colisão, sendo n o tamanho do 
+        operações para encontrar uma colisão, sendo n o tamanho do 
         output da função.
 
 - SHA-1
