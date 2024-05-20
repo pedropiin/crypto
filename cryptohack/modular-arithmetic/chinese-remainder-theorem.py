@@ -15,7 +15,7 @@ def sort_together(mods, ints):
 
 """
 Solution to the Chinese Remainder Theorem (CTR) through 
-sieving. Definetly no the most efficient method, but it's
+sieving. Definetly not the most efficient method, but it's
 sufficient for the problem.
 """
 def sieving_ctr(mods, ints):
