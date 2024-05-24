@@ -55,6 +55,7 @@ void get_word(unsigned char **round_keys, int num_word, unsigned char *word) {
     }
 }
 
+
 void g_function(unsigned char *word, int num_round) {
     LookupTables ltables;
 
@@ -72,18 +73,39 @@ void g_function(unsigned char *word, int num_round) {
     }
 }
 
+// TODO: implement function that generate random bytes and populates the key
+void gen_random_key(unsigned char *key, size_t key_size);
+
+
 // round_key[11][16], with each row being 16 bytes or 4 words used in the round 'i'
-void key_schedule(unsigned char *key, size_t key_size = 16, unsigned char **round_keys, size_t num_rounds = 11) {
+void key_schedule(unsigned char *key, unsigned char **round_keys, size_t key_size = 16, size_t num_rounds = 10) {
     // The first round_key is exactly the same as the original key, that is, the same 16 bytes
     for (int i = 0; i < (int)key_size; i++) {
         round_keys[0][i] = key[i];
     }
     
     unsigned char *word = new unsigned char[4];
-    for (int i = 1; i < (int)(num_rounds); i++) {
+    for (int i = 1; i <= (int)(num_rounds); i++) {
+        // Getting the last word form the previous round
         get_word(round_keys, (4 * i) - 1, word);
 
+        // Apllying the g() function to the last word
+        g_function(word, i);
+
+        // Getting the first word of the round, that is, W[4i]
+        for (int j = 0; j < 4; j++) {
+            round_keys[i][j] = round_keys[i - 1][j] ^ word[j];
+        }
+
+        // Getting the remaning words, that is, W[4i + 1], W[4i + 2] and W[4i + 3]
+        for (int t = 1; t < 4; t++) {
+            for (int j = 0; j < 4; j++) {
+                round_keys[i][j + (4 * t)] = round_keys[i][j + (4 * (t - 1))] ^ round_keys[i - 1][j + (4 * t)];
+            }
+        }
     }
+
+    delete [] word;
 }
 
 /*
@@ -106,17 +128,21 @@ BYTE SUBSTITUTION:
 
 
 int main(int argc, char* argv[]) {
-    size_t num_rounds = 11;
+    size_t num_rounds = 10;
     size_t block_size = 16;
-    unsigned char *key = new unsigned char[block_size];
+    size_t key_size = 16;
+
+    unsigned char *key = new unsigned char[key_size];
     unsigned char *plaintext = new unsigned char[block_size];
 
     unsigned char **round_keys;
     round_keys = new unsigned char*[num_rounds];
     for (int i = 0; i < (int)num_rounds; i++) {
-        round_keys[i] = new unsigned char[block_size];
+        round_keys[i] = new unsigned char[key_size];
     }
-    // TODO: implement random key
+    // gen_random_key(key, key_size);
+    key_schedule(key, round_keys, key_size, num_rounds);
+
 
 
     return 0;
