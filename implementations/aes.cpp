@@ -185,7 +185,13 @@ class LookupTables {
 
 
 // TODO: implement function that generate random bytes and populates the key
-void gen_random_key(unsigned char *key, size_t key_size);
+void gen_random_key(unsigned char *key, size_t key_size) {
+    srand((unsigned) time(NULL));
+
+    for (int i = 0; i < key_size; i++) {
+        key[i] = (unsigned char)(rand() % 256);
+    }
+}
 
 
 void get_word(unsigned char **round_keys, int num_word, unsigned char *word, int round) {
@@ -241,6 +247,14 @@ void print_state_matrix(unsigned char **state_matrix) {
         for (int i = 0; i < N_STATE_MATRIX; i++) {
             std::cout << std::hex << (int)state_matrix[i][j] << " ";
         }
+    }
+    std::cout << std::endl;
+}
+
+void output_ciphertext(unsigned char *ciphertext) {
+    std::cout << "The ciphertext is:\n";
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        std::cout << std::hex << (int)ciphertext[i] << " ";
     }
     std::cout << std::endl;
 }
@@ -414,40 +428,23 @@ int main(int argc, char* argv[]) {
     unsigned char *plaintext = new unsigned char[BLOCK_SIZE];
     unsigned char *ciphertext = new unsigned char[BLOCK_SIZE];
 
-    // Testing values:
-    key[0] = 0x5f;
-    key[1] = 0x13;
-    key[2] = 0x6b;
-    key[3] = 0x71;
-    key[4] = 0x4c;
-    key[5] = 0x8f;
-    key[6] = 0x20;
-    key[7] = 0xab;
-    key[8] = 0xcc;
-    key[9] = 0x07;
-    key[10] = 0xeb;
-    key[11] = 0xff;
-    key[12] = 0x94;
-    key[13] = 0x55;
-    key[14] = 0x25;
-    key[15] = 0x3f;
-
-    plaintext[0] = 0x5f;
-    plaintext[1] = 0x13;
-    plaintext[2] = 0x6b;
-    plaintext[3] = 0x71;
-    plaintext[4] = 0x4c;
-    plaintext[5] = 0x8f;
-    plaintext[6] = 0x20;
-    plaintext[7] = 0xab;
-    plaintext[8] = 0xcc;
-    plaintext[9] = 0x07;
-    plaintext[10] = 0xeb;
-    plaintext[11] = 0xff;
-    plaintext[12] = 0x94;
-    plaintext[13] = 0x55;
-    plaintext[14] = 0x25;
-    plaintext[15] = 0x3f;
+    // Testing values
+    // plaintext[0] = 0x5f;
+    // plaintext[1] = 0x13;
+    // plaintext[2] = 0x6b;
+    // plaintext[3] = 0x71;
+    // plaintext[4] = 0x4c;
+    // plaintext[5] = 0x8f;
+    // plaintext[6] = 0x20;
+    // plaintext[7] = 0xab;
+    // plaintext[8] = 0xcc;
+    // plaintext[9] = 0x07;
+    // plaintext[10] = 0xeb;
+    // plaintext[11] = 0xff;
+    // plaintext[12] = 0x94;
+    // plaintext[13] = 0x55;
+    // plaintext[14] = 0x25;
+    // plaintext[15] = 0x3f;
 
     unsigned char **round_keys;
     round_keys = new unsigned char*[num_rounds + 1];
@@ -455,18 +452,17 @@ int main(int argc, char* argv[]) {
         round_keys[i] = new unsigned char[key_size];
     }
 
-    // gen_random_key(key, key_size);
+    // Generating pseudo-random nonce key;
+    gen_random_key(key, key_size);
+
+    // Expanding the original key into the nr round keys
     key_schedule(key, round_keys, key_size, num_rounds);
 
     // Encryption function
     encrypt_block(plaintext, ciphertext, round_keys, num_rounds, key_size);
 
-    // Testing function
-    std::cout << "Printing the ciphertext:\n";
-    for (int i = 0; i < BLOCK_SIZE; i++) {
-        std::cout << std::hex << (int)ciphertext[i] << " ";
-    }
-    std::cout << std::endl;
+    // Outputing the ciphertext
+    output_ciphertext(ciphertext);
 
     // Freeing the memory allocated in the main()
     delete [] key;
