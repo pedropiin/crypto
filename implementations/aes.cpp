@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
 
 
 #define BLOCK_SIZE 16
@@ -187,9 +188,10 @@ class LookupTables {
 void gen_random_key(unsigned char *key, size_t key_size);
 
 
-void get_word(unsigned char **round_keys, int num_word, unsigned char *word) {
-    int round = num_word / 4;
-    int idx_word = num_word % 2;
+void get_word(unsigned char **round_keys, int num_word, unsigned char *word, int round) {
+    // Number that will be used to get the index of the first byte of the associated word
+    // e.g.: W[3] will start at index 12 of the round[0]. Therefore, round_keys[0][4 * 3]
+    int idx_word = num_word % 4;
     for (int i = 0; i < 4; i++) {
         word[i] = round_keys[round][4 * idx_word + i];
     }
@@ -226,6 +228,22 @@ void build_state_matrix(unsigned char **state_matrix, unsigned char *plaintext) 
     }
 }
 
+void state_matrix_to_array(unsigned char **state_matrix, unsigned char *arr) {
+    for (int i = 0; i < N_STATE_MATRIX; i++) {
+        for (int j = 0; j < N_STATE_MATRIX; j++) {
+            arr[(4 * i) + j] = state_matrix[j][i];
+        }
+    }
+}
+
+void print_state_matrix(unsigned char **state_matrix) {
+    for (int j = 0; j < N_STATE_MATRIX; j++) {
+        for (int i = 0; i < N_STATE_MATRIX; i++) {
+            std::cout << std::hex << (int)state_matrix[i][j] << " ";
+        }
+    }
+    std::cout << std::endl;
+}
 
 // round_key[11][16], with each row being 16 bytes or 4 words used in the round 'i'
 void key_schedule(unsigned char *key, unsigned char **round_keys, size_t key_size = 16, size_t num_rounds = 10) {
@@ -237,7 +255,7 @@ void key_schedule(unsigned char *key, unsigned char **round_keys, size_t key_siz
     unsigned char *word = new unsigned char[4];
     for (int i = 1; i <= (int)(num_rounds); i++) {
         // Getting the last word form the previous round
-        get_word(round_keys, (4 * i) - 1, word);
+        get_word(round_keys, (4 * i) - 1, word, (i - 1));
 
         // Apllying the g() function to the last word
         g_function(word, i);
@@ -309,7 +327,7 @@ void mix_single_column(unsigned char **state_matrix, unsigned char *res_column, 
             if (coeff_mult == 1) {
                 temp ^= state_matrix[j][column]; // OBS: passing the element 'j' as the index for the row to easily implement the function
             } else {
-                temp ^= state_matrix[j][column] ^ ltables.galois_multiplication[coeff_mult][state_matrix[j][column]];
+                temp ^= ltables.galois_multiplication[coeff_mult][state_matrix[j][column]];
             }
         }
         res_column[i] = temp;
@@ -328,6 +346,8 @@ void mix_columns(unsigned char **state_matrix) {
     for (int j = 0; j < N_STATE_MATRIX; j++) {
         mix_single_column(state_matrix, res_column, j);
     }
+
+    delete [] res_column;
 }
 
 void key_addition(unsigned char **state_matrix, unsigned char **round_keys, int round) {
@@ -340,32 +360,94 @@ void key_addition(unsigned char **state_matrix, unsigned char **round_keys, int 
     }
 }
 
+void encrypt_block(unsigned char *plaintext, unsigned char *ciphertext, unsigned char **round_keys, size_t num_rounds, size_t key_size) {
+    // Allocating space in memory for the state matrix
+    unsigned char **state_matrix;
+    state_matrix = new unsigned char*[N_STATE_MATRIX];
+    for (int i = 0; i < N_STATE_MATRIX; i++) {
+        state_matrix[i] = new unsigned char[N_STATE_MATRIX];
+    }
+
+    // Arranging the plaintext in the state matrix format
+    build_state_matrix(state_matrix, plaintext);
+
+    // First key addition
+    key_addition(state_matrix, round_keys, 0);
+    
+    // Executing all rounds
+    for (int i = 1; i <= (int)num_rounds; i++) {
+        // Byte Substitution Layer
+        byte_substitution(state_matrix);
+
+        // Shift Rows Layer
+        shift_rows(state_matrix);
+
+        // Mix Columns Layer is only done up to the second to last round, that is, round 9
+        if (i < (int)num_rounds) {
+            mix_columns(state_matrix);
+        }
+
+        // Key Addition Layer
+        key_addition(state_matrix, round_keys, i);
+
+    }
+
+    // Transforming the state_matrix into the ciphertext array
+    state_matrix_to_array(state_matrix, ciphertext);
+
+
+    // Freeing the memory allocated to state_matrix
+    for (int i = 0; i < N_STATE_MATRIX; i++) {
+        delete [] state_matrix[i];
+    }
+    delete [] state_matrix;
+}
+
 
 int main(int argc, char* argv[]) {
+    // Constants to the structure of AES
+    // AES supports 128 bit, 196 and 258 key sizes, doing, respectively, 10, 12 and 14 rounds
     size_t num_rounds = 10;
     size_t key_size = 16;
 
     unsigned char *key = new unsigned char[key_size];
+    unsigned char *plaintext = new unsigned char[BLOCK_SIZE];
+    unsigned char *ciphertext = new unsigned char[BLOCK_SIZE];
 
     // Testing values:
-    // key[0] = 0x5f;
-    // key[1] = 0x13;
-    // key[2] = 0x6b;
-    // key[3] = 0x71;
-    // key[4] = 0x4c;
-    // key[5] = 0x8f;
-    // key[6] = 0x20;
-    // key[7] = 0xab;
-    // key[8] = 0xcc;
-    // key[9] = 0x07;
-    // key[10] = 0xeb;
-    // key[11] = 0xff;
-    // key[12] = 0x94;
-    // key[13] = 0x55;
-    // key[14] = 0x25;
-    // key[15] = 0x3f;
+    key[0] = 0x5f;
+    key[1] = 0x13;
+    key[2] = 0x6b;
+    key[3] = 0x71;
+    key[4] = 0x4c;
+    key[5] = 0x8f;
+    key[6] = 0x20;
+    key[7] = 0xab;
+    key[8] = 0xcc;
+    key[9] = 0x07;
+    key[10] = 0xeb;
+    key[11] = 0xff;
+    key[12] = 0x94;
+    key[13] = 0x55;
+    key[14] = 0x25;
+    key[15] = 0x3f;
 
-    unsigned char *plaintext = new unsigned char[BLOCK_SIZE];
+    plaintext[0] = 0x5f;
+    plaintext[1] = 0x13;
+    plaintext[2] = 0x6b;
+    plaintext[3] = 0x71;
+    plaintext[4] = 0x4c;
+    plaintext[5] = 0x8f;
+    plaintext[6] = 0x20;
+    plaintext[7] = 0xab;
+    plaintext[8] = 0xcc;
+    plaintext[9] = 0x07;
+    plaintext[10] = 0xeb;
+    plaintext[11] = 0xff;
+    plaintext[12] = 0x94;
+    plaintext[13] = 0x55;
+    plaintext[14] = 0x25;
+    plaintext[15] = 0x3f;
 
     unsigned char **round_keys;
     round_keys = new unsigned char*[num_rounds + 1];
@@ -376,21 +458,25 @@ int main(int argc, char* argv[]) {
     // gen_random_key(key, key_size);
     key_schedule(key, round_keys, key_size, num_rounds);
 
+    // Encryption function
+    encrypt_block(plaintext, ciphertext, round_keys, num_rounds, key_size);
+
     // Testing function
+    std::cout << "Printing the ciphertext:\n";
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        std::cout << std::hex << (int)ciphertext[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // Freeing the memory allocated in the main()
+    delete [] key;
+    delete [] plaintext;
+    delete [] ciphertext;
+
     for (int i = 0; i < (int)(num_rounds + 1); i++) {
-        std::cout << "Chave do round " << i << ":" << std::endl;
-        for (int j = 0; j < (int)key_size; j++) {
-            std::cout << round_keys[i][j] << " ";
-        }
-        std::cout << std::endl;
+        delete [] round_keys[i];
     }
-
-    unsigned char **state_matrix;
-    state_matrix = new unsigned char*[N_STATE_MATRIX];
-    for (int i = 0; i < N_STATE_MATRIX; i++) {
-        state_matrix[i] = new unsigned char[N_STATE_MATRIX];
-    }
-
+    delete [] round_keys;
 
     return 0;
 }
