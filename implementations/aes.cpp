@@ -178,6 +178,13 @@ class LookupTables {
             {3, 1, 1, 2}
         };
 
+        int inv_mix_columns_coefficients[4][4] = {
+            {14, 11, 13, 9},
+            {9, 14, 11, 13},
+            {13, 9, 14, 11},
+            {11, 13, 9, 14}
+        };
+
         unsigned char round_coefficient[10] = {
             0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36
         };
@@ -252,7 +259,7 @@ void print_state_matrix(unsigned char **state_matrix) {
 }
 
 void output_ciphertext(unsigned char *ciphertext) {
-    std::cout << "The ciphertext is:\n";
+    // std::cout << "The ciphertext is:\n";
     for (int i = 0; i < BLOCK_SIZE; i++) {
         std::cout << std::hex << (int)ciphertext[i] << " ";
     }
@@ -301,6 +308,16 @@ void byte_substitution(unsigned char **state_matrix) {
     }
 }
 
+void inv_byte_substitution(unsigned char **state_matrix) {
+    LookupTables ltables;
+
+    for (int j = 0; j < N_STATE_MATRIX; j++) {
+        for (int i = 0; i < N_STATE_MATRIX; i++) {
+            state_matrix[j][i] = ltables.inv_s_box[state_matrix[j][i]];
+        }
+    }
+}
+
 void shift_rows(unsigned char **state_matrix) {
     // First row stays the same
 
@@ -329,15 +346,48 @@ void shift_rows(unsigned char **state_matrix) {
     state_matrix[3][3] = temp2;
 }
 
-void mix_single_column(unsigned char **state_matrix, unsigned char *res_column, int column) {
+void inv_shift_rows(unsigned char **state_matrix) {
+    // First row stays the same
+
+    // Second row is shifted one position to the right
+    unsigned char temp = state_matrix[1][3];
+    state_matrix[1][3] = state_matrix[1][2];
+    state_matrix[1][2] = state_matrix[1][1];
+    state_matrix[1][1] = state_matrix[1][0];
+    state_matrix[1][0] = temp;
+
+    // Third row is shifted two positions to the right
+    temp = state_matrix[2][3];
+    unsigned char temp1 = state_matrix[2][2];
+    state_matrix[2][3] = state_matrix[2][1];
+    state_matrix[2][2] = state_matrix[2][0];
+    state_matrix[2][1] = temp;
+    state_matrix[2][0] = temp1;
+
+    // Fourth row is shifted three positions to the right
+    temp = state_matrix[3][3];
+    temp1 = state_matrix[3][2];
+    unsigned char temp2 = state_matrix[3][1];
+    state_matrix[3][3] = state_matrix[3][0];
+    state_matrix[3][2] = temp;
+    state_matrix[3][1] = temp1;
+    state_matrix[3][0] = temp2;
+}
+
+void mix_single_column(unsigned char **state_matrix, unsigned char *res_column, int column, int encryption=1) {
     LookupTables ltables;
 
     // Matrix Multiplication of a single column with the coefficient 
     // matrix to get the corresponding resulting column
+    int coeff_mult;
     for (int i = 0; i < N_STATE_MATRIX; i++) {
         unsigned char temp = 0x00;
         for (int j = 0; j < N_STATE_MATRIX; j++) {
-            int coeff_mult = ltables.mix_columns_coefficients[i][j];
+            if (encryption == 1) {
+                coeff_mult = ltables.mix_columns_coefficients[i][j];
+            } else {
+                coeff_mult = ltables.inv_mix_columns_coefficients[i][j];
+            }
             if (coeff_mult == 1) {
                 temp ^= state_matrix[j][column]; // OBS: passing the element 'j' as the index for the row to easily implement the function
             } else {
@@ -353,12 +403,12 @@ void mix_single_column(unsigned char **state_matrix, unsigned char *res_column, 
     }
 }
 
-void mix_columns(unsigned char **state_matrix) {
+void mix_columns(unsigned char **state_matrix, int encryption=1) {
     LookupTables ltables;
 
     unsigned char *res_column = new unsigned char[4];
     for (int j = 0; j < N_STATE_MATRIX; j++) {
-        mix_single_column(state_matrix, res_column, j);
+        mix_single_column(state_matrix, res_column, j, encryption);
     }
 
     delete [] res_column;
@@ -417,6 +467,53 @@ void encrypt_block(unsigned char *plaintext, unsigned char *ciphertext, unsigned
     delete [] state_matrix;
 }
 
+void decrypt_block(unsigned char *ciphertext, unsigned char *decoded, unsigned char **round_keys, size_t num_rounds, size_t key_size) {
+    // Allocating memory space for the state matrix
+    unsigned char **state_matrix = new unsigned char*[N_STATE_MATRIX];
+    for (int i = 0; i < N_STATE_MATRIX; i++) {
+        state_matrix[i] = new unsigned char[N_STATE_MATRIX];
+    }
+
+    build_state_matrix(state_matrix, ciphertext);
+
+    for (int i = (int)num_rounds; i > 0; i--) {
+        key_addition(state_matrix, round_keys, i);
+
+        std::cout << "----- State matrix após key addition layer -----\n";
+        print_state_matrix(state_matrix);
+
+        if (i < (int)num_rounds) {
+            mix_columns(state_matrix, 0);
+            std::cout << "----- State matrix após inverse mix columns layer -----\n";
+            print_state_matrix(state_matrix);
+        }
+
+        inv_shift_rows(state_matrix);
+
+        std::cout << "----- State matrix após inverse shift rows layer -----\n";
+        print_state_matrix(state_matrix);
+
+        inv_byte_substitution(state_matrix);
+
+        std::cout << "----- State matrix após inverse byte substitution layer -----\n";
+        print_state_matrix(state_matrix);
+
+        std::cout << "\n ||||| FIM DO ROUND " << i << " |||||\n\n";
+    }
+
+    key_addition(state_matrix, round_keys, 0);
+
+    std::cout << "----- State matrix após última key addition layer -----\n";
+    print_state_matrix(state_matrix);
+
+    state_matrix_to_array(state_matrix, decoded);
+
+    for (int i = 0; i < N_STATE_MATRIX; i++) {
+        delete [] state_matrix[i];
+    }
+    delete [] state_matrix;
+}
+
 
 int main(int argc, char* argv[]) {
     // Constants to the structure of AES
@@ -427,24 +524,25 @@ int main(int argc, char* argv[]) {
     unsigned char *key = new unsigned char[key_size];
     unsigned char *plaintext = new unsigned char[BLOCK_SIZE];
     unsigned char *ciphertext = new unsigned char[BLOCK_SIZE];
+    unsigned char *decoded = new unsigned char[BLOCK_SIZE];
 
     // Testing values
-    // plaintext[0] = 0x5f;
-    // plaintext[1] = 0x13;
-    // plaintext[2] = 0x6b;
-    // plaintext[3] = 0x71;
-    // plaintext[4] = 0x4c;
-    // plaintext[5] = 0x8f;
-    // plaintext[6] = 0x20;
-    // plaintext[7] = 0xab;
-    // plaintext[8] = 0xcc;
-    // plaintext[9] = 0x07;
-    // plaintext[10] = 0xeb;
-    // plaintext[11] = 0xff;
-    // plaintext[12] = 0x94;
-    // plaintext[13] = 0x55;
-    // plaintext[14] = 0x25;
-    // plaintext[15] = 0x3f;
+    plaintext[0] = 0x5f;
+    plaintext[1] = 0x13;
+    plaintext[2] = 0x6b;
+    plaintext[3] = 0x71;
+    plaintext[4] = 0x4c;
+    plaintext[5] = 0x8f;
+    plaintext[6] = 0x20;
+    plaintext[7] = 0xab;
+    plaintext[8] = 0xcc;
+    plaintext[9] = 0x07;
+    plaintext[10] = 0xeb;
+    plaintext[11] = 0xff;
+    plaintext[12] = 0x94;
+    plaintext[13] = 0x55;
+    plaintext[14] = 0x25;
+    plaintext[15] = 0x3f;
 
     unsigned char **round_keys;
     round_keys = new unsigned char*[num_rounds + 1];
@@ -455,6 +553,9 @@ int main(int argc, char* argv[]) {
     // Generating pseudo-random nonce key;
     gen_random_key(key, key_size);
 
+    std::cout << "The key is:\n";
+    output_ciphertext(key);
+
     // Expanding the original key into the nr round keys
     key_schedule(key, round_keys, key_size, num_rounds);
 
@@ -462,12 +563,19 @@ int main(int argc, char* argv[]) {
     encrypt_block(plaintext, ciphertext, round_keys, num_rounds, key_size);
 
     // Outputing the ciphertext
+    std::cout << "The ciphertext is:\n";
     output_ciphertext(ciphertext);
+
+    decrypt_block(ciphertext, decoded, round_keys, num_rounds, key_size);
+
+    std::cout << "The decoded ciphertet is:" << std::endl;
+    output_ciphertext(decoded);
 
     // Freeing the memory allocated in the main()
     delete [] key;
     delete [] plaintext;
     delete [] ciphertext;
+    delete [] decoded;
 
     for (int i = 0; i < (int)(num_rounds + 1); i++) {
         delete [] round_keys[i];
