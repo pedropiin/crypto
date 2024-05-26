@@ -43,7 +43,7 @@ class LookupTables {
             0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31, 0xb1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xec, 0x5f,
             0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef,
             0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
-            0x17, 0x2b, 0x04, 0x75, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
+            0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
         };
 
         unsigned char galois_multiplication[16][256] = {
@@ -191,13 +191,33 @@ class LookupTables {
 };
 
 
-// TODO: implement function that generate random bytes and populates the key
-void gen_random_key(unsigned char *key, size_t key_size) {
+void gen_random_16byte_arr(unsigned char *arr, size_t arr_size) {
     srand((unsigned) time(NULL));
 
-    for (int i = 0; i < key_size; i++) {
-        key[i] = (unsigned char)(rand() % 256);
+    for (int i = 0; i < arr_size; i++) {
+        arr[i] = (unsigned char)(rand() % 256);
     }
+}
+
+void populate_plaintext(unsigned char *plaintext) {
+    // Testing values
+    plaintext[0] = 0x5f;
+    plaintext[1] = 0x13;
+    plaintext[2] = 0x6b;
+    plaintext[3] = 0x71;
+    plaintext[4] = 0x4c;
+    plaintext[5] = 0x8f;
+    plaintext[6] = 0x20;
+    plaintext[7] = 0xab;
+    plaintext[8] = 0xcc;
+    plaintext[9] = 0x07;
+    plaintext[10] = 0xeb;
+    plaintext[11] = 0xff;
+    plaintext[12] = 0x94;
+    plaintext[13] = 0x55;
+    plaintext[14] = 0x25;
+    plaintext[15] = 0x3f;
+
 }
 
 
@@ -258,10 +278,9 @@ void print_state_matrix(unsigned char **state_matrix) {
     std::cout << std::endl;
 }
 
-void output_ciphertext(unsigned char *ciphertext) {
-    // std::cout << "The ciphertext is:\n";
+void output_arr(unsigned char *arr) {
     for (int i = 0; i < BLOCK_SIZE; i++) {
-        std::cout << std::hex << (int)ciphertext[i] << " ";
+        std::cout << std::hex << (int)arr[i] << " ";
     }
     std::cout << std::endl;
 }
@@ -479,32 +498,16 @@ void decrypt_block(unsigned char *ciphertext, unsigned char *decoded, unsigned c
     for (int i = (int)num_rounds; i > 0; i--) {
         key_addition(state_matrix, round_keys, i);
 
-        std::cout << "----- State matrix após key addition layer -----\n";
-        print_state_matrix(state_matrix);
-
         if (i < (int)num_rounds) {
             mix_columns(state_matrix, 0);
-            std::cout << "----- State matrix após inverse mix columns layer -----\n";
-            print_state_matrix(state_matrix);
         }
 
         inv_shift_rows(state_matrix);
 
-        std::cout << "----- State matrix após inverse shift rows layer -----\n";
-        print_state_matrix(state_matrix);
-
         inv_byte_substitution(state_matrix);
-
-        std::cout << "----- State matrix após inverse byte substitution layer -----\n";
-        print_state_matrix(state_matrix);
-
-        std::cout << "\n ||||| FIM DO ROUND " << i << " |||||\n\n";
     }
 
     key_addition(state_matrix, round_keys, 0);
-
-    std::cout << "----- State matrix após última key addition layer -----\n";
-    print_state_matrix(state_matrix);
 
     state_matrix_to_array(state_matrix, decoded);
 
@@ -521,28 +524,14 @@ int main(int argc, char* argv[]) {
     size_t num_rounds = 10;
     size_t key_size = 16;
 
+    // Variable that defines the method of use:
+    // 0 => decryption && 1 => encryption
+    bool encrypt = 1;
+
     unsigned char *key = new unsigned char[key_size];
     unsigned char *plaintext = new unsigned char[BLOCK_SIZE];
     unsigned char *ciphertext = new unsigned char[BLOCK_SIZE];
     unsigned char *decoded = new unsigned char[BLOCK_SIZE];
-
-    // Testing values
-    plaintext[0] = 0x5f;
-    plaintext[1] = 0x13;
-    plaintext[2] = 0x6b;
-    plaintext[3] = 0x71;
-    plaintext[4] = 0x4c;
-    plaintext[5] = 0x8f;
-    plaintext[6] = 0x20;
-    plaintext[7] = 0xab;
-    plaintext[8] = 0xcc;
-    plaintext[9] = 0x07;
-    plaintext[10] = 0xeb;
-    plaintext[11] = 0xff;
-    plaintext[12] = 0x94;
-    plaintext[13] = 0x55;
-    plaintext[14] = 0x25;
-    plaintext[15] = 0x3f;
 
     unsigned char **round_keys;
     round_keys = new unsigned char*[num_rounds + 1];
@@ -551,25 +540,30 @@ int main(int argc, char* argv[]) {
     }
 
     // Generating pseudo-random nonce key;
-    gen_random_key(key, key_size);
-
-    std::cout << "The key is:\n";
-    output_ciphertext(key);
+    gen_random_16byte_arr(key, key_size);
 
     // Expanding the original key into the nr round keys
     key_schedule(key, round_keys, key_size, num_rounds);
 
-    // Encryption function
-    encrypt_block(plaintext, ciphertext, round_keys, num_rounds, key_size);
+    // Generating pseudo-random plaintext for showcase purposes
+    // If you wish to encrypt a specific plaintext, use the function populate_plaintext(plaintext)
+    gen_random_16byte_arr(plaintext, BLOCK_SIZE);
 
-    // Outputing the ciphertext
-    std::cout << "The ciphertext is:\n";
-    output_ciphertext(ciphertext);
+    if (encrypt) {
+        // Calling the encryption function
+        encrypt_block(plaintext, ciphertext, round_keys, num_rounds, key_size);
 
-    decrypt_block(ciphertext, decoded, round_keys, num_rounds, key_size);
+        // Outputting the ciphertext
+        std::cout << "The ciphertext, i.e., encrypted plaintext, is:" << std::endl;
+        output_arr(ciphertext);
+    } else {
+        // Calling the decryption function
+        decrypt_block(ciphertext, decoded, round_keys, num_rounds, key_size);
 
-    std::cout << "The decoded ciphertet is:" << std::endl;
-    output_ciphertext(decoded);
+        // Outputting the plaintext after decryption
+        std::cout << "The plaintext, i.e., decrypted ciphertext, is:" << std::endl;
+        output_arr(decoded);
+    }
 
     // Freeing the memory allocated in the main()
     delete [] key;
