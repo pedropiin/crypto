@@ -10,7 +10,7 @@ Repository to store notes, exercises, challenges, implementations and other thin
 ## Cryptohack
 - [Introduction](cryptohack-solutions/introduction)
 
-- [Modulare Arithmetic](cryptohack-solutions/modular-arithmetic) 
+- [Modular Arithmetic](cryptohack-solutions/modular-arithmetic) 
 
 - [Symmetric Cryptography](cryptohack-solutions/symmetric-cryptography)
 
