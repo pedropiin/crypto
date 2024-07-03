@@ -3,7 +3,7 @@
 ## 1.1)
 Qualquer ferramenta online de decripção pode ser utilizada.
 O texto claro, portanto, é: "Cryptographic systems are 
-extrememly difficult to build. Nevertheless, for some reason, 
+extremely difficult to build. Nevertheless, for some reason, 
 many non-experts insist on designing new encryption schemes 
 that seem to them to be more secure than any other scheme 
 on earth. The unfortunate truth, however, is that such 
@@ -13,9 +13,9 @@ schemes are usually trivial to break."
 Ter um oráculo de texto em claro, ou seja, um ataque de
 chosen-plaintext, torna decifrar a cifra de Vigenère trivial,
 já que um atacante passa a ter acesso a aos mapeamentos
-e transformações realizadas para cada caracter. Assim, com
+e transformações realizadas para cada caractere. Assim, com
 uma rápida análise, é possível formar a chave, analisando
-qual caracter foi aplicado em cada posição do plaintext.
+qual caractere foi aplicado em cada posição do plaintext.
 A quantidade de caracteres de plaintext necessárias está
 associada ao tamanho da chave. Se tal característica é 
 satisfeita, sabe-se o valor 'k' da transformação para 

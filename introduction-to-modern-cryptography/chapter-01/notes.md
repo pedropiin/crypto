@@ -1,4 +1,4 @@
-# Introduction and Classical Crytography
+# Introduction and Classical Cryptography
 
 - Princípio de Kerckhoff
     - Um esquema criptográfico deve ser seguro mesmo que algum
@@ -7,14 +7,14 @@
     na distribuição e escolha da chave, já que todo o resto 
     deve ser tido como conhecimento público.
 
-- Cifras clássicas
+- Cifras clássicas ^7a72d0
     - Shift Cipher
-        - Chave é um valor k ϵ [0, 25] que rerpresenta o número 
+        - Chave é um valor k ϵ [0, 25] que representa o número 
         de trocas das letras
         - Cifra de César tinha k = 3
         - ROT-13 é uma shift cipher com k = 13
     - Cifra de substituição monoalfabética
-        - Basicamente uma cifa afim, em que agora cada letra é
+        - Basicamente uma cifra afim, em que agora cada letra é
         associada à uma nova letra do texto cifrado individualmente.
             - Portanto, o espaço amostral de chaves contêm todas as 
             possibilidade de bijeções no alfabeto.
@@ -26,7 +26,7 @@
         que é aplicada em blocos individuais do texto em claro.
         Então a mesma letra pode ser mapeada para mais de uma
         outra letra no texto cifrado.
-            - Obscura a frequência de cada caracter
+            - Obscura a frequência de cada caractere
         - Se o tamanho da chave é conhecido, pode ser quebrada por
         análise de distribuição de frequência para cada uma das 
         't' streams em O(26*t)
