@@ -30,5 +30,5 @@
 
 - Teorema de Shannon
 	- Seja (**Gen**, **Enc**, **Dec**) um esquema criptográfico com |*M*| = |*K*| = |*C*|. O esquema é perfeitamente sigiloso ⟺ 
-		- ∀ *k* ϵ *K* tem P[**Gen**() = k] = 1/|*K*|
+		- ∀ *k* ϵ *K*, tem-se que P[**Gen**() = k] = 1/|*K*|
 		- ∀ *m* ϵ *M* e ∀ *c* ϵ *C*, ∃! *k* ϵ *K* | **Enc**<sub>k</sub>(*m*) = c

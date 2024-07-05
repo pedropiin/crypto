@@ -1,3 +1,6 @@
 # Respostas
 
-## 
+## 2.1)
+Seja **Gen** o algoritmo de geração de chaves, *K* o espaço amostral de chaves e *R* o espaço amostral de fitas utilizadas como entrada para o algoritmo **Gen**. Suponhamos que o algoritmo **Gen** seleciona uma chave *k* $\in$ *K* com uma probabilidade *p*, implicando que *k* não necessariamente é selecionada uniformemente. Como **Gen** é randômico e utiliza fitas randômicas para gerar chaves, temos que uma parcela *p* das fitas possíveis leva **Gen** a gerar *k*. 
+Agora vamos redefinir o espaço amostral de chaves como o espaço de todas as fitas randômicas *R*, tal que há uma distribuição uniforme sobre *R* para seleção de fitas *r*. Assim, a probabilidade de gerar um mesmo valor *k* não foi alterada, já que existe uma *fração-p* de fitas *r* que levam **Gen** a gerar *k*, reforçando que *k* não é mais considerada a chave nessa reestruturação.
+Podemos definir agora a função de encriptação como **Enc**(*m*, **Gen**(*r*)), onde as chaves *r* são selecionadas uniformemente, mas P[C = *c* | M = *m*] não foi alterada, já que *c* é gerado a partir da encriptação de *m* com um valor *k*, e a probabilidade de tal valor *k* particular ser selecionado não foi alterada, como visto acima.
