@@ -7,7 +7,7 @@
     na distribuição e escolha da chave, já que todo o resto 
     deve ser tido como conhecimento público.
 
-- Cifras clássicas ^7a72d0
+- Cifras clássicas
     - Shift Cipher
         - Chave é um valor k ϵ [0, 25] que representa o número 
         de trocas das letras
