@@ -16,3 +16,23 @@ A afirmação é falsa. Suponhamos um esquema criptográfico $\Pi$ perfeitamente
 Seja *A* um adversário probabilístico que utiliza a distribuição randômica do lançamento de moedas para selecionar um bit *b'* como resposta no experimento. Podemos construir um adversário *A'* que utiliza sempre uma sequência ótima de moedas lançadas por *A* como resposta. Assim, *A'* é determinístico e mantém um desempenho no mínimo igual do de *A* na média, já que seleciona os resultados otimizados do mesmo. Desse modo, podemos sempre assumir que *A* é um adversário determinístico, já que qualquer adversário probabilístico pode ser convertido e otimizado como um novo adversário determinístico.
 
 ## 2.6)
+$\implies$ Buscamos provar que se um esquema criptográfico é perfeitamente sigiloso, é também perfeitamente indistinguível. Suponhamos $\Pi$ um esquema criptográfico perfeitamente sigiloso. Por definição, P[**Enc<sub>k</sub>(*m0*)** = *c*] == P[**Enc<sub>k</sub>(*m1*)** = *c*]. Sejam *m0* e *m1* as mensagens dadas como entrada por um adversário *A* em um experimento de indistinguibilidade. Definimos também *C0* como o conjunto de ciphertext para quais o adversário *A* dá como resposta do experimento *b'* = 0, e *C1* o conjunto equivalente para *b'* = 1. Válido notar que *C0* $\cup$ *C1* equivalem a todos os ciphertext possíveis. Assim:
+P[**PrivK**<sub>A, Π</sub><sup>eav</sup> = 1] == 1/2 * P[**PrivK**<sub>A, Π</sub><sup>eav</sup> = 1 | *b* = 0] + 1/2 * P[**PrivK**<sub>A, Π</sub><sup>eav</sup> = 1 | *b* = 1] == 1/2 * P[*A* responder 0 | *b* = 0] + 1/2 * P[A responder 1 | *b* = 1] == 1/2 * $\sum\limits_{c ∈ C0}$ P[**Enc<sub>k</sub>(*m0*)** = *c*] + 1/2 * $\sum\limits_{c ∈ C0}$ P[**Enc<sub>k</sub>(*m1*)** = *c*] == 1/2 * $\sum\limits_{c ∈ C0}$ P[**Enc<sub>k</sub>(*m0*)** = *c*] + 1/2 * $\sum\limits_{c ∈ C0}$ P[**Enc<sub>k</sub>(*m0*)** = *c*] == 1/2 * $\sum\limits_{c ∈ C}$ P[**Enc<sub>k</sub>(*m0*)** = *c*]  = 1/2 * 1 = 1/2
+
+## 2.7)
+0x012345 ^ 0xffeedd = 0xfecd98
+
+## 2.8.a)
+O esquema não é perfeitamente sigiloso, já que P[M = 0] = 1/5, porém P[M = 0 | C = 0] = 1/3 (probabilidade da chave ser 0 ou 5). Assim, P[M = *m* | C = *c*] $\neq$ P[M = *m*], contrariando a definição.
+
+2.8.b)
+O esquema é perfeitamente seguro e isso pode ser provado pela semelhança com o One-Time Pad (OTP). O esquema descrito funciona da mesma forma que OTP, com o único diferencial sendo concatenar um bit extra = 0 no final. Porém, como a encriptação e a decriptação também concatenam um 0 à chave, tal bit nunca vai ser alterado, e, portanto, pode ser ignorado.
+
+## 2.9.a)
+O esquema não é perfeitamente sigiloso. P[Enc(0) = 0] = P[K = 0] = 1/2, porém P[Enc(1) = 0] = P[K = 2] = 0. Portanto, P[Enc(0) = 0] $\neq$ P[Enc(1) = 0], contrariando a definição de sigilo perfeito
+
+## 2.9.b)
+Sabemos pelo enunciado que |*M*| = 3 = |*K*| = 3 = |*C*| = 3. Juntamente, nos é informado que **Gen()** seleciona uma chave uniformemente do espaço de chaves. Portanto, $\forall$ *k* $\in$ *K*, P[**Gen()** = k] = 1/|*K*| = 1/3. Juntamente, cada par de plaintext / ciphertext (*m*, *c*) só é ligado por uma chave única *k*, já que só para cada um desses pares, existe apenas um valor que satisfaça a equação de encriptação dentro do espaços amostrais apresentados. Portanto, como ambas condições do Teorema de Shannon foram satisfeitas, o esquema é perfeitamente sigiloso.
+
+2.9.c)
+O esquema não é perfeitamente sigiloso, porque quebra a relação *a priori* e *a posteriori* entre mensagem e ciphertext. Por exemplo: P[M = 0] = 1/2, mas P[M = 0 | C = 2] = P[K = 2] = 1/3. Portanto, P[M = *m* | C = *c*] $\neq$ P[M = m].
