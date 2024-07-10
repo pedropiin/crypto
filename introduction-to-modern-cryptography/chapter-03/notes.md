@@ -1,0 +1,43 @@
+# Private-Key Encryption
+
+- Segurança Computacional
+	- Sigilo perfeito impõe que deve ser impossível que um atacante com tempo ilimitado e poder computacional infinito consiga obter qualquer informação sobre uma mensagem encriptada enviada
+		- Na prática, tal rigor é desnecessário, já que não há nenhum indivíduo que tenha tamanho poder sob suas mãos.
+		- Relaxamentos
+			- Segurança apenas precisa ser garantida contra atacantes eficientes e com tempo limitado, já que na prática há um limite para poder computacional
+			- Um esquema não precisa ser 100% a prova de vazamentos, já que uma baixíssima probabilidade de falha ainda é irrelevante.
+	- Abordagem concreta
+		- Quantifica explicitamente os limites de um esquema criptográfico
+		- **Definição**: um esquema é (*t*, $\epsilon$)-seguro se qualquer adversário que roda no máximo em tempo *t* consegue quebrar o esquema com probabilidade máxima $\epsilon$.
+		- Limitada, pois garantias concretas são difíceis de serem aplicadas universalmente, já que cada indivíduo potencialmente malicioso esta sujeito à diferentes condições
+	- Abordagem assintótica
+		- **Definição:** Um esquema criptográfico é seguro se qualquer adversário probabilístico de tempo polinomial (PPT) consegue quebrar o esquema com no máximo uma probabilidade insignificante.
+		- Define os parâmetros de segurança de um esquema em função de um polinômio associado ao tamanho da chave.
+			- Possível mexer na função para configurar o esquema de acordo com os níveis procurados de segurança
+		- Em muitos casos, avanços no poder computacional disponível, se feitos por ambas partes (indivíduos honestos e indivíduos maliciosos), tornam o esquema ainda mais complicado de ser quebrado.
+		- Definições relacionadas:
+			- Função polinomial
+				- Uma função *f* é dita polinomial se existe uma constante *c* tal que *f(n)* < *n<sup>c</sup>* para qualquer *n*.
+			- Algoritmo polinomial
+				- Um algoritmo *A* é dito polinomial se existem um polinômio *p* tal que para qualquer input *x* $\in$ {0, 1}<sup>*</sup>, *A(x)* é finalizado em no máximo *p(|x|)* passos.
+			- Algoritmo probabilístico
+				- Um algoritmo é dito probabilístico se possui acesso à uma sequência de bits randômicos e independentes.
+			- Função insignificante
+				- Uma função *f* *R* -> *R<sup>+</sup>* é dita insignificante se $\forall$ polinômio *p* $\exists$ *N* tal que $\forall$ *n* > *N*, *f(n) < 1/p(n)* 
+				- Equivalentemente, para qualquer contante *c*, existe um *N* tal que para todo *n* > *N*, *f(n) < n<sup>-c</sup>*.
+				- Propriedades
+					- Se *negl1* e *negl2* são funções insignificantes, então *negl3* = *negl1 + negl2* também é insignificante
+					- Para qualquer polinômio *p*, a função *negl4* = *p * negl1* também é insignificante
+					- Se uma função *g* não é insignificante, então a função *f = g / p* também não será, para qualquer polinômio *p*.
+
+- Encritação Computacionalmente Segura
+	- Um **esquema criptográfico de chave privada** consistem em um conjunto de três algoritmos PPT:
+		- **Gen():** recebe como entrada uma string 1<sup>n</sup> referente ao parâmetro de segurança do esquema e dá como saída uma chave *k* aleatória.
+		- **Enc():** recebe como entrada uma chave *k* e uma mensagem *m* $\in$ {0, 1}<sup>*</sup> e devolve como saída um ciphertext *c*
+		- **Dec():** recebe como entrada uma chave *k* e um ciphertext *c* e devolve como saída uma mensagem *m* ou uma mensagem de erro
+			- É obrigatório que $\forall$ *n*, $\forall$ *k*, $\forall$ *m*, **Dec<sub>k</sub>(Enc<sub>k</sub>(*m*))** == *m*
+			- Pode-se assumir **Dec()** como um algoritmo determinístico
+	- Segurança-EAV
+		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que, $\forall$ n, **P[PrivK<sub>A, Π</sub><sup>eav</sup> (n) = 1] $\le$ 1/2 + negl(n)**
+		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que **<center>|P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 0)) = 1] - P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 1)) = 1]| $\le$ negl(n)</center>**
+		- 
