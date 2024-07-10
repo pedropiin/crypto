@@ -1,16 +1,16 @@
 # Private-Key Encryption
 
-- Segurança Computacional
+- ## 3.1 - Segurança Computacional
 	- Sigilo perfeito impõe que deve ser impossível que um atacante com tempo ilimitado e poder computacional infinito consiga obter qualquer informação sobre uma mensagem encriptada enviada
 		- Na prática, tal rigor é desnecessário, já que não há nenhum indivíduo que tenha tamanho poder sob suas mãos.
 		- Relaxamentos
 			- Segurança apenas precisa ser garantida contra atacantes eficientes e com tempo limitado, já que na prática há um limite para poder computacional
 			- Um esquema não precisa ser 100% a prova de vazamentos, já que uma baixíssima probabilidade de falha ainda é irrelevante.
-	- Abordagem concreta
+	- ### 3.1.1 - Abordagem concreta
 		- Quantifica explicitamente os limites de um esquema criptográfico
 		- **Definição**: um esquema é (*t*, $\epsilon$)-seguro se qualquer adversário que roda no máximo em tempo *t* consegue quebrar o esquema com probabilidade máxima $\epsilon$.
 		- Limitada, pois garantias concretas são difíceis de serem aplicadas universalmente, já que cada indivíduo potencialmente malicioso esta sujeito à diferentes condições
-	- Abordagem assintótica
+	- ### 3.1.2 - Abordagem assintótica
 		- **Definição:** Um esquema criptográfico é seguro se qualquer adversário probabilístico de tempo polinomial (PPT) consegue quebrar o esquema com no máximo uma probabilidade insignificante.
 		- Define os parâmetros de segurança de um esquema em função de um polinômio associado ao tamanho da chave.
 			- Possível mexer na função para configurar o esquema de acordo com os níveis procurados de segurança
@@ -30,14 +30,23 @@
 					- Para qualquer polinômio *p*, a função *negl4* = *p * negl1* também é insignificante
 					- Se uma função *g* não é insignificante, então a função *f = g / p* também não será, para qualquer polinômio *p*.
 
-- Encritação Computacionalmente Segura
+- ## 3.2 - Encriptação Computacionalmente Segura
 	- Um **esquema criptográfico de chave privada** consistem em um conjunto de três algoritmos PPT:
 		- **Gen():** recebe como entrada uma string 1<sup>n</sup> referente ao parâmetro de segurança do esquema e dá como saída uma chave *k* aleatória.
 		- **Enc():** recebe como entrada uma chave *k* e uma mensagem *m* $\in$ {0, 1}<sup>*</sup> e devolve como saída um ciphertext *c*
 		- **Dec():** recebe como entrada uma chave *k* e um ciphertext *c* e devolve como saída uma mensagem *m* ou uma mensagem de erro
 			- É obrigatório que $\forall$ *n*, $\forall$ *k*, $\forall$ *m*, **Dec<sub>k</sub>(Enc<sub>k</sub>(*m*))** == *m*
 			- Pode-se assumir **Dec()** como um algoritmo determinístico
-	- Segurança-EAV
+	- ### 3.2.1 - Segurança-EAV
 		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que, $\forall$ n, **P[PrivK<sub>A, Π</sub><sup>eav</sup> (n) = 1] $\le$ 1/2 + negl(n)**
-		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que **<center>|P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 0)) = 1] - P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 1)) = 1]| $\le$ negl(n)</center>**
-		- 
+		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que **P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 0)) = 1] - P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 1)) = 1]| ≤ negl(n)**
+	- Existem casos em que descobrir o tamanho do plaintext revela informações sobre o mesmo. Portanto, deve-se analisar se o esquema a ser implementado permite mensagens de tamanho arbitrário e se o contexto torna o tamanho das mensagens algo sensível
+	- ### 3.2.2 - Segurança Semântica
+		- **Teorema 3.10:** Seja $\Pi$ = (**Enc**, **Dec**) um esquema criptográfico de chave privada de tamanho fixo para mensagens de tamanho *l* que é EAV-seguro. Então para qualquer adversário adversário *A* PPT e *i* $\in$ {1, ..., *l*}, existe uma função insignificante *negl* tal que **P[*A*(1<sup>n</sup>, Enc<sub>k</sub>(*m*)) = *m*<sup>i</sup>] $\le$ 1/2 + negl(*n*)
+		- **Teorema 3.11:** Seja $\Pi$ = (**Enc**, **Dec**) um esquema criptográfico de chave privada de tamanho fixo para mensagens de tamanho *l* que é EAV-seguro. Então para qualquer algoritmo *A* PPT, existe um algoritmo *A'* PPT tal que para qualquer distribuição *D* sobre {0, 1}<sup>l</sup> e qualquer função *f*: {0, 1}<sup>l</sup> $\rightarrow$ {0, 1}, existe uma função insignificante *negl* tal que **|P[*A*(1<sup>n</sup>, Enc<sub>k</sub>(*m*)) = *f*(*m*)] - P[*A'*(1<sup>n</sup>) = *f*(*m*)]| $\le$ negl(*n*)**
+			- Isso significa que, dado um esquema criptográfico EAV-seguro, se existe um algoritmo adversário *A* capaz de computar corretamente com alguma probabilidade *f*(*m*) dado Enc<sub>k</sub>(*m*), então existe um outro algoritmo adversário *A'* que também consegue computar *f(m)* com praticamente a mesma probabilidade sem ter acesso a Enc<sub>k</sub>(*m*).
+		- **Definição:** um esquema criptográfico (**Enc**, **Dec**) é **semanticamente seguro na presença de um ouvinte escondido** se para todo algoritmo *A* PPT existe uma algoritmo *A'* PPT, tal que para qualquer algoritmo *Samp* PPT e funções polinomiais *f* e *h*, a proposição segue que **|P[*A*(1<sup>n</sup>, Enc<sub>k</sub>(*m*), *h*(*m*)) = *f*(*m*)] - P[*A'*(1<sup>n</sup>, |*m*|, *h*(*m*)) = *f*(*m*)]| $\le$ negl(*n*)**
+			- Resumidamente, *A* tenta calcular *f*(*m*) dado o parâmetro de segurança, a encriptação da mensagem *m* e informações arbitrárias externas *h*(*m*). Já *A'* tenta calcular *f*(*m*) dado apenas o parâmetro de segurança, o tamanho da mensagem e as informações externas. A definição garante que a diferença de probabilidade de acerto de ambos algoritmos adversários é insignificante.
+		- **Teorema 3.13:** Um esquema criptográfico é EAV-seguro $\iff$ é semanticamente seguro.
+
+- ## 3.3 Construção de esquemas criptográficos EAV-seguros

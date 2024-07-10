@@ -5,7 +5,7 @@ Repository to store notes, exercises, challenges, implementations and other thin
 ## Notes
 - [Understading Cryptography: A Textbook for Students and Practitioners - Christof Paar](understanding-cryptography)
 
-- [Introduction to Modern Cryptograhy - Jonathan Katz && Yehuda Lindell](introduction-to-modern-cryptography)
+- [Introduction to Modern Cryptography - Jonathan Katz && Yehuda Lindell](introduction-to-modern-cryptography)
 
 ## Cryptohack
 - [Introduction](cryptohack-solutions/introduction)
