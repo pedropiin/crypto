@@ -4,7 +4,7 @@
 	- Necessário coletar dados com alta entropia e processá-los para que se tornem uniformes e independentes
 		- É possível obter dados de alta entropia a partir de fontes externas, como delays entre eventos em algum servidor na web, cliques no mouse, ou até ruído na variação térmica de processadores
 
-- Definições
+- ## 2.1 - Definições
 	- Corretude perfeita
 		- **Enc**<sub>k</sub>(m) = *c*, tal que *c* pode ter valores diferentes, isto é, probabilístico; enquanto **Dec**<sub>k</sub>(c) = *m* gerará o mesmo resultado com probabilidade = 1, ou seja, é determinístico.
 	- Distribuições probabilísticas sobre *K* dependem do algoritmo de geração de chaves, isto é, **Gen**
@@ -22,13 +22,13 @@
 			- A saída do experimento é 1 se *b'* = *b* e 0 caso contrário. Simultaneamente, **PrivK**<sub>A, Π</sub><sup>eav</sup> = 1 se a saída do experimento é 1 e, consequentemente, o adversário *A* foi bem sucedido. 
 		- Seja um esquema criptográfico Π = (**Gen**, **Enc**, **Dec**) com espaço amostral de mensagens *M*. Seja também **PrivK**<sub>A, Π</sub><sup>eav</sup> um experimento de indistinguibilidade do adversário. Π é **perfeitamente indistinguível** ⟺ Pr[**PrivK**<sub>A, Π</sub><sup>eav</sup> = 1] = 1/2.
 
-- One-Time Pad (OTP)
+- ## 2.2 - One-Time Pad (OTP)
 	- Esquema de encriptação perfeitamente sigiloso em que cada mensagem *m* é encriptada através de um XOR com uma chave aleatória *k* única.
 		- len(*m*) = len(*k*)
 		- Chave *k* deve ser compartilhada através de método seguro e de confiança para ambas partes envolvidas na comunicação.
 	- Não eficiente, pois armazenar uma chave do mesmo tamanho de cada mensagem é extremamente inviável. Para mais, deve-se gerar uma chave única para cada mensagem, tal que é impossível prever o tamanho da mensagem a ser encriptada.
 
-- Teorema de Shannon
+- ## 2.4 - Teorema de Shannon
 	- Seja (**Gen**, **Enc**, **Dec**) um esquema criptográfico com |*M*| = |*K*| = |*C*|. O esquema é perfeitamente sigiloso ⟺ 
 		- ∀ *k* ϵ *K*, tem-se que P[**Gen**() = k] = 1/|*K*|
 		- ∀ *m* ϵ *M* e ∀ *c* ϵ *C*, ∃! *k* ϵ *K* | **Enc**<sub>k</sub>(*m*) = c

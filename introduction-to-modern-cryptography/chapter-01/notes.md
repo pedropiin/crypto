@@ -1,13 +1,13 @@
 # Introduction and Classical Cryptography
 
-- Princípio de Kerckhoff
+- ## 1.2- Princípio de Kerckhoff
     - Um esquema criptográfico deve ser seguro mesmo que algum
     indivíduo malicioso saiba tudo sobre o esquema, exceto a chave.
     Isso significa que a segurança de uma cifra deve se basear
     na distribuição e escolha da chave, já que todo o resto 
     deve ser tido como conhecimento público.
 
-- Cifras clássicas
+- ## 1.3 - Cifras clássicas
     - Shift Cipher
         - Chave é um valor k ϵ [0, 25] que representa o número 
         de trocas das letras
@@ -37,8 +37,8 @@
         aleatória do tamanho do plaintext, pode ser considerada 
         inquebrável.
 
-- Criptografia Moderna X Criptografia Clássica
-    - Princípio I: Definições formais
+- ## 1.4 - Criptografia Moderna X Criptografia Clássica
+    - ### 1.4.1 - Princípio I: Definições formais
         - Criptografia moderna estabeleceu como necessário definir,
         previamente ao design de qualquer esquema criptográfico, seus
         objetivos
@@ -57,7 +57,7 @@
                 - Known-plaintext attack
                 - Chosen-plaintext attack
                 - Chosen-ciphertext attack
-    - Princípio II: Suposições precisas
+    - ### 1.4.2 - Princípio II: Suposições precisas
         - Muitos esquemas criptográficos são baseados em problemas que
         não foram provados que pertencem à NP-completo, mas são problemas
         sem solução eficiente, ou seja, a melhor estratégia envolve
