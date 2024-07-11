@@ -38,8 +38,8 @@
 			- É obrigatório que $\forall$ *n*, $\forall$ *k*, $\forall$ *m*, **Dec<sub>k</sub>(Enc<sub>k</sub>(*m*))** == *m*
 			- Pode-se assumir **Dec()** como um algoritmo determinístico
 	- ### 3.2.1 - Segurança-EAV
-		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que, $\forall$ n, **P[PrivK<sub>A, Π</sub><sup>eav</sup> (n) = 1] $\le$ 1/2 + negl(n)**
-		- Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que **P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 0)) = 1] - P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 1)) = 1]| ≤ negl(n)**
+		- **Definição:** Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que, $\forall$ n, **P[PrivK<sub>A, Π</sub><sup>eav</sup> (n) = 1] $\le$ 1/2 + negl(n)**
+		- **Definição:** Um esquema criptográfico $\Pi$ = (**Gen**, **Enc**, **Dec**) tem **encriptações indistinguíveis na presença de ouvintes escondidos** (é **EAV-seguro**) se para qualquer adversário *A* PPT, existe uma função insignificante *negl* tal que **P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 0)) = 1] - P[out<sub>A</sub>(PrivK<sub>A, Π</sub><sup>eav</sup>(n, 1)) = 1]| ≤ negl(n)**
 	- Existem casos em que descobrir o tamanho do plaintext revela informações sobre o mesmo. Portanto, deve-se analisar se o esquema a ser implementado permite mensagens de tamanho arbitrário e se o contexto torna o tamanho das mensagens algo sensível
 	- ### 3.2.2 - Segurança Semântica
 		- **Teorema 3.10:** Seja $\Pi$ = (**Enc**, **Dec**) um esquema criptográfico de chave privada de tamanho fixo para mensagens de tamanho *l* que é EAV-seguro. Então para qualquer adversário adversário *A* PPT e *i* $\in$ {1, ..., *l*}, existe uma função insignificante *negl* tal que **P[*A*(1<sup>n</sup>, Enc<sub>k</sub>(*m*)) = *m*<sup>i</sup>] $\le$ 1/2 + negl(*n*)
@@ -50,3 +50,54 @@
 		- **Teorema 3.13:** Um esquema criptográfico é EAV-seguro $\iff$ é semanticamente seguro.
 
 - ## 3.3 Construção de esquemas criptográficos EAV-seguros
+	- ### 3.3.1 Geradores de números pseudoaleatórios
+		- A ideia é utilizar uma pequena quantidade de números aleatórios (*seed*) para gerar uma grande quantidade de números pseudoaleatórios.
+		- Para que uma distribuição *D* seja uma boa distribuição pseudoaleatória, qualquer amostra dela deve ser indistinguível de uma amostra uniforme para um observador polinomial
+			- Não faz sentido chamar uma string de pseudoaleatória, já que se trata de uma característica para uma distribuição de strings.
+		- **Definição:** Seja *G* um algoritmo polinomial determinístico tal que $\forall$ *n* e $\forall$ *s* $\in$ {0, 1}<sup>n</sup>, *G(s)* retorna uma string de tamanho *l(n)*. *G* é **pseudoaleatório** $\iff$ 
+			- (Expansão): $\forall$ *n*, *l(n)* > *n* 
+			- (Pseudoaleatoriedade): Para todo algoritmo *D* PPT, existe uma função insignificante *negl* tal que **|P[*D*(*G*(*s*)) = 1] - P[*D*(*r*) = 1]| $\le$ *negl*(*n*) 
+		- É trivial diferenciar uma string verdadeiramente aleatória de uma string pseudoaleatória dado tempo ilimitado com um algoritmo exponencial.
+			- Se *G* recebe uma *seed* de tamanho *n* e devolve uma string de tamanho 2*n*, significa que *G* consegue gerar no máximo 2<sup>n</sup> strings de tamanho 2*n*, sendo que, obviamente, existem 2<sup>2n</sup> strings de tamanho 2*n*.
+	- Utilizar reduções em provas e análises de segurança de esquemas criptográficos é um método extremamente prático. A ideia é provar que um esquema criptográfico é seguro assumindo que, por exemplo, um algoritmo *G* é um gerador pseudoaleatório, ao invés de provar a segurança incondicional de uma construção.
+		- Permite que a base da prova de segurança esteja relacionada à uma primitiva de baixo nível (e.g. distribuição válida de um gerador pseudoaleatório) ao invés de ter que provar a segurança de todo o esquema criptográfico
+		- Permite que a construção do esquema seja facilitada, já que é muito mais simples formular uma primitiva do que um esquema de alto nível
+		- Permite variabilidade na utilização e na instanciação do esquema criptográfico, pois dado que é seguro com um gerador pseudoaleatório, qualquer construção dessa primitiva pode ser implementada.
+
+- ## 3.4 - Definições fortes de Segurança 
+	- ### 3.4.1 - Segurança para encriptações múltiplas
+		- Experimento de ouvinte escondido para múltiplas mensagens **PrivK<sub>A, Π</sub><sup>mult</sup>(*n):**
+			- Adversário *A* recebe como entrada o parâmetro de segurança 1<sup>n</sup> e devolve duas listas de tamanho igual, com *M0* = (*m<sub>0,1</sub>*, ..., *m<sub>0, t</sub>*) e *M1* =(*m<sub>1, 1</sub>*, ..., *m<sub>1, t</sub>*), tal que $\forall$ i, |*m<sub>0,i</sub>*| = |*m<sub>1,i</sub>*|
+			- *k* $\leftarrow$ Gen(1<sup>n</sup>) e escolhe-se *b* $\in$ {0, 1}. $\forall$ i, *c<sub>i</sub>* $\leftarrow$ Enc<sub>k</sub>(*m<sub>b, i</sub>*) tal que *C* = (c<sub>1</sub>, ..., c<sub>t</sub>) é dado para *A*
+			- *A* escolhe *b'* tal que a saída do experimento é 1 $\iff$ *b'* = *b*, e 0 caso contrário.
+		- **Definição:** Um esquema criptográfico $\Pi$ = (Gen, Enc, Dec) tem **múltiplas encriptações indistinguíveis perante um ouvinte escondido** se $\forall$ adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>mult</sup>(*n*) = 1] $\le$ 1/2 + negl(*n*)**
+		- Se um esquema criptográfico tem sua função de encriptação Enc determinística, tal esquema não tem segurança para múltiplas encriptações
+	- ### 3.4.2 - Segurança-CPA
+		- Experimento de indistinguibilidade contra CPA **PrivK<sub>A, Π</sub><sup>cpa</sup>(*n):**
+			- *k* $\leftarrow$ Gen(1<sup>n</sup>)
+			- *A* recebe 1<sup>n</sup> e Enc<sub>k</sub>(.) como oráculo e devolve *m<sub>0</sub>* e *m<sub>1</sub>* tal que |*m<sub>0</sub>*| = |*m<sub>1</sub>*| 
+			- *b* é escolhido e *c* $\leftarrow$ Enc<sub>k</sub>(*m*<sub>b</sub>) é devolvido para *A* 
+			- O adversário *A* continua com seu acesso ao oráculo Enc<sub>k</sub>(.) e devolve palpite *b'*
+			- A saída do experimento é 1 $\iff$ *b'* = *b* e 0 caso contrário
+		- **Definição:** Um esquema criptográfico $\Pi$ = (Gen, Enc, Dec) tem **encriptações indistinguíveis perante um CPA (é CPA-seguro)** se $\forall$ adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>cpa</sup>(*n*) = 1] $\le$ 1/2 + negl(n)**
+	- ### 3.4.3 - Segurança-CPA para múltiplas encriptações
+		- Um oráculo LR<sub>k,b</sub> devolve *c* $\leftarrow$ Enc<sub>k</sub>(*m*<sub>b</sub>), dadas duas mensagens *m0* e *m1* e um bit *b* escolhido uniformemente. Se *b* = 0, o adversário *A* sempre recebe a encriptação da mensagem da esquerda (nesse caso, *m0*), e caso *b* = 1, recebe a encriptação da mensagem da direita.
+		- Experimento de indistinguibilidade contra CPA **PrivK<sub>A, Π</sub><sup>LR-cpa</sup>(*n):**
+			- *k* $\leftarrow$ Gen(1<sup>n</sup>)
+			- *A* recebe 1<sup>n</sup> e LR<sub>k,b</sub>(., .) como oráculo e devolve *m<sub>0</sub>* e *m<sub>1</sub>* tal que |*m<sub>0</sub>*| = |*m<sub>1</sub>*| 
+			- *b* é escolhido e *c* $\leftarrow$ LR<sub>k,b</sub>(*m*<sub>b</sub>) é devolvido para *A* 
+			- O adversário *A* continua com seu acesso ao oráculo LR<sub>k,b</sub>(., .) e devolve palpite *b'*
+			- A saída do experimento é 1 $\iff$ *b'* = *b* e 0 caso contrário
+		- **Definição:** Um esquema criptográfico $\Pi$ = (Gen, Enc, Dec) tem **encriptações múltiplas indistinguíveis perante um CPA (é CPA-seguro para encriptações múltiplas)** se $\forall$ adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>LR-cpa</sup>(*n*) = 1] $\le$ 1/2 + negl(n)
+		- É possível simular um oráculo comum com um oráculo LR passando a mesma mensagem duas vezes, ou seja, chamando LR<sub>k,b</sub>(*m*, *m*)
+		- **Teorema 3.23:** Todo esquema criptográfico que é CPA-seguro também é CPA-seguro para múltiplas encriptações
+
+- ## 3.5 - Construção de esquemas criptográficos CPA-seguros
+	- ### 3.5.1 - Funções pseudoaleatórias e permutações
+		- Uma função chaveada *F*: {0, 1}<sup>*</sup> x {0, 1}<sup>*</sup> $\rightarrow$ {0, 1}<sup>*</sup> é uma função que representa todas as funções *F*<sub>k</sub> $\in$ *Func*<sub>n</sub> com *F*: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup>, tal que $\forall$ s $\in$ *S*, $\forall$ x $\in$ {0, 1}<sup>n</sup>, *F*<sub>s</sub>(x) = *F*(K<sub>s</sub>, x), sendo *S* o espaço de chaves.
+			- *F* é eficiente se existe um algoritmo polinomial que calcule *F*(k, x) para dado *k* e *x*.
+			- *F* preserva tamanhos se o *l*<sub>k</sub> = *l*<sub>in</sub> = *l*<sub>out</sub> = n
+		- Uma função *F*: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup> é considerada pseudoaleatória se *F<sub>k</sub>*, dado um *k* uniforme, é indistinguível de uma função escolhida uniforme e aleatoriamente de *Func*<sub>n</sub>, sendo *Func*<sub>n</sub> o conjunto de todas as funções que mapeiam strings de *n* bits para strings de *n* bits.
+		- Cada função *F*<sub>k</sub>: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup> pode ser enxergada como uma lookup-table em que cada posição da tabela guarda uma das strings possíveis de serem geradas por *F*<sub>k</sub>. Portanto, tal lookup-table tem *n* * 2<sup>n</sup> entradas.
+		- **Definição:** Um função chaveada eficiente *length preserving* *F*: {0, 1}<sup>*</sup> x {0, 1}<sup>*</sup> $\rightarrow$ {0, 1}<sup>*</sup> é uma **função pseudoaleatória** se para qualquer diferenciador *D* PPT, existe uma função insignificante *negl* tal que **|P[*D*<sup>F<sub>k</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ negl(*n*)**
+		- 
