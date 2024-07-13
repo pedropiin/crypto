@@ -97,7 +97,45 @@
 		- Uma função chaveada *F*: {0, 1}<sup>*</sup> x {0, 1}<sup>*</sup> $\rightarrow$ {0, 1}<sup>*</sup> é uma função que representa todas as funções *F*<sub>k</sub> $\in$ *Func*<sub>n</sub> com *F*: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup>, tal que $\forall$ s $\in$ *S*, $\forall$ x $\in$ {0, 1}<sup>n</sup>, *F*<sub>s</sub>(x) = *F*(K<sub>s</sub>, x), sendo *S* o espaço de chaves.
 			- *F* é eficiente se existe um algoritmo polinomial que calcule *F*(k, x) para dado *k* e *x*.
 			- *F* preserva tamanhos se o *l*<sub>k</sub> = *l*<sub>in</sub> = *l*<sub>out</sub> = n
-		- Uma função *F*: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup> é considerada pseudoaleatória se *F<sub>k</sub>*, dado um *k* uniforme, é indistinguível de uma função escolhida uniforme e aleatoriamente de *Func*<sub>n</sub>, sendo *Func*<sub>n</sub> o conjunto de todas as funções que mapeiam strings de *n* bits para strings de *n* bits.
+		- Uma função *F*: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup> é considerada **pseudoaleatória** se *F<sub>k</sub>*, dado um *k* uniforme, é indistinguível de uma função escolhida uniforme e aleatoriamente de *Func*<sub>n</sub>, sendo *Func*<sub>n</sub> o conjunto de todas as funções que mapeiam strings de *n* bits para strings de *n* bits.
 		- Cada função *F*<sub>k</sub>: {0, 1}<sup>n</sup> $\rightarrow$ {0, 1}<sup>n</sup> pode ser enxergada como uma lookup-table em que cada posição da tabela guarda uma das strings possíveis de serem geradas por *F*<sub>k</sub>. Portanto, tal lookup-table tem *n* * 2<sup>n</sup> entradas.
 		- **Definição:** Um função chaveada eficiente *length preserving* *F*: {0, 1}<sup>*</sup> x {0, 1}<sup>*</sup> $\rightarrow$ {0, 1}<sup>*</sup> é uma **função pseudoaleatória** se para qualquer diferenciador *D* PPT, existe uma função insignificante *negl* tal que **|P[*D*<sup>F<sub>k</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ negl(*n*)**
-		- 
+		- (Checar primeiro exercício resolvido do capítulo)
+		- Uma função *F*: {0, 1}<sup>l<sub>in</sub>(n)</sup> $\rightarrow$ {0, 1}<sup>l<sub>in</sub>(n)</sup> é considerada uma **permutação chaveada** se *l*<sub>in</sub> = *l*<sub>out</sub> e se $\forall$ *k* $\in$ {0, 1}<sup>l<sub>key</sub>(n)</sup> *F*<sub>k</sub> é injetora. É uma **permutação pseudoaleatória** se é indistinguível de uma permutação uniforme.
+			- Se *F* é uma permutação pseudoaleatória com *l*<sub>in</sub> $\ge$ *n* então *F* é também uma função pseudoaleatória.
+		- **Definição:** Seja *F*: {0, 1}<sup>*</sup> x {0, 1}<sup>*</sup> $\rightarrow$ {0, 1}<sup>*</sup> uma permutação chaveada eficiente e *length preserving*. *F* é uma **permutação pseudoaleatória forte** se para qualquer diferenciador *D* PPT, existe uma função insignificante negl tal que **|P[*D*<sup>F<sub>k</sub>(.),F<sub>k</sub><sup>-1</sup>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.), f<sup>-1</sup></sup>(1<sup>n</sup>) = 1]| $\le$ negl(*n*)
+	- ### 3.5.2 - Segurança CPA a partir de uma função pseudoaleatória (PRF)
+		- **Construção:** Seja *F* uma função pseudoaleatória. Tem-se um esquema de encriptação de chave privada e tamanho fixo CPA-seguro para mensagens de tamanho *n* com:
+			- **Gen**: gera *k* $\in$ {0, 1}<sup>n</sup> uniforme a partir de 1<sup>n</sup> dado pela entrada
+			- **Enc**: a partir da chave *k* e de uma mensagem *m* $\in$ {0, 1}<sup>n</sup>, escolhe um *r* $\in$ {0, 1}<sup>n</sup> uniforme e devolve *c* $\coloneqq$ (*r*, *F*<sub>k</sub>(*r*) $\oplus$ *m*)
+			- **Dec:** a partir da chave *k* e do ciphertext *c* = (r, s), devolve a mensagem *m* $\coloneqq$ *F*<sub>k</sub>(*r*) $\oplus$ *s*.
+
+- ## 3.6 - Modos de Operação e Encriptação na Prática
+	- ### 3.6.1 - Cifras de fluxo
+		- Tipo de construção criptográfica que produz bits gradualmente e sob demanda. Portanto, não é limitado à quantidade de bits a serem produzidos e torna desnecessário descartar bits extras (já que no caso não vão existir)
+		- Par de algoritmos determinísticos (**Init**, **Next**), com
+			- **Init():** recebe como entrada uma seed *s* uniforme e opcionalmente um *IV* e devolve um estado inicial *st*
+			- **Next():** recebe o estado atual *st* e devolve um bit *y* junto com o estado atualizado *st'*
+		- Podemos definir um algoritmo **GetBits()** que, com um parâmetro *l* chama **Init** e depois **Next** *l* vezes, de modo a receber uma string *y* de tamanho *l*
+		- Temos um PRG a partir de uma cifra de fluxo com ***G*<sup>l</sup>(*s*) = GetBits(Init(*s*), 1<sup>l</sup>)
+			- A cifra é segura se *G<sup>l</sup>* é um PRG para algum *l* polinomial
+		- Temos uma PRF a partir de uma cifra de fluxo com ***F<sub>s</sub><sup>l</sup>*(*IV*) = GetBits(Init(*s*, *IV*), 1<sup>l</sup>)
+			- A cifra é segura de *F<sup>l</sup>* é uma função pseudoaleatória para um *l* polinomial
+		- É possível construir cifras de fluxo a partir de funções pseudoaleatórias
+			- Seja *F* uma função pseudoaleatória. Se **Init** aceita um *IV* de tamanho 3*n*/4 e **Next** devolve *n* bits por rodada, temos uma cifra de fluxo (**Init**, **Next**) com:
+				- **Init:** recebe *s* $\in$ {0, 1}<sup>n</sup> e *IV* $\in$ {0, 1}<sup>3n/4</sup> como entrada e devolve o estado *st* = (*s*, *IV*, 0)
+				- **Next:** recebe *st* = (*s*, *IV*, *i*) como entrada e devolve *y* $\coloneqq$ *F*<sub>s</sub>(*IV* || [*i*]) e o estado atualizado *st'* = (*s*, *IV*, *i* + 1)
+					- Válido ressaltar que [*i*] é a representação binária de *i* com *n*/4 bits
+					- É uma construção segura desde que não seja utilizada para gerar mais de 2<sup>n/4</sup> blocos, já que, como o "contador" é representado apenas com *n*/4 bits, passará a repetir encriptações
+	- ### 3.6.2 - Modos de operação de cifras de fluxo
+		- Modo sincronizado
+			- Utilizado para encriptar mensagens trocadas online durante alguma sessão de comunicação. Não faz uso de *IV*
+			- (1) Ambas partes chamam **Init(*k*)** para iniciarem a comunicação estando no mesmo estado. 
+			- (2) Seja *st<sub>s</sub>* o estado do remetente *S*. Para encriptar uma mensagem, *S* realiza (*y*, *st<sub>s</sub>'*) $\coloneqq$ GetBits(*st<sub>s</sub>*, 1<sup>|m|</sup>), envia o ciphertext *c* $\coloneqq$ *m* $\oplus$ *y* e atualiza seu estado para *st<sub>s</sub>*
+			- (3) Seja *st<sub>r</sub>* o estado do destinatário *R*. Ao receber *c* de *S*, *R* calcula (*y*, *st<sub>r</sub>'*) $\coloneqq$ GetBits(*st<sub>r</sub>*, 1<sup>|c|</sup>), obtêm *m* $\coloneqq$ *c* $\oplus$ *y* e atualiza seu estado para *st<sub>r</sub>'*.
+		- Modo dessincronizado
+			- Faz uso de *IV*
+			- **Gen:** recebe 1<sup>n</sup> como entrada e devolve *k* $\in$ {0, 1}<sup>n</sup> uniforme
+			- **Enc:** com chave *k* e mensagem *m*, seleciona *IV* $\in$ {0, 1}<sup>n</sup> e devolve [*IV*, GetBits(Init(*k*, *IV*), 1<sup>|m|</sup>) $\oplus$ *m*] 
+			- **Dec:** com chave *k* e ciphertext [*IV*, *c*], devolve *m* $\coloneqq$ GetBits(Init(*k*, *IV*), 1<sup>|c|</sup>) $\oplus$ *c*
+	- ### 3.6.3 - Cifras de Bloco e Modos de Operação de Cifras de Bloco
