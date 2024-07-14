@@ -129,13 +129,46 @@
 					- É uma construção segura desde que não seja utilizada para gerar mais de 2<sup>n/4</sup> blocos, já que, como o "contador" é representado apenas com *n*/4 bits, passará a repetir encriptações
 	- ### 3.6.2 - Modos de operação de cifras de fluxo
 		- Modo sincronizado
+			- O fluxo de chave não depende de nenhum ciphertext. Isso implica que tais chaves podem ser pré-computadas, já que não dependem sequer das mensagens que vão ser posteriormente encriptadas.
 			- Utilizado para encriptar mensagens trocadas online durante alguma sessão de comunicação. Não faz uso de *IV*
 			- (1) Ambas partes chamam **Init(*k*)** para iniciarem a comunicação estando no mesmo estado. 
 			- (2) Seja *st<sub>s</sub>* o estado do remetente *S*. Para encriptar uma mensagem, *S* realiza (*y*, *st<sub>s</sub>'*) $\coloneqq$ GetBits(*st<sub>s</sub>*, 1<sup>|m|</sup>), envia o ciphertext *c* $\coloneqq$ *m* $\oplus$ *y* e atualiza seu estado para *st<sub>s</sub>*
 			- (3) Seja *st<sub>r</sub>* o estado do destinatário *R*. Ao receber *c* de *S*, *R* calcula (*y*, *st<sub>r</sub>'*) $\coloneqq$ GetBits(*st<sub>r</sub>*, 1<sup>|c|</sup>), obtêm *m* $\coloneqq$ *c* $\oplus$ *y* e atualiza seu estado para *st<sub>r</sub>'*.
 		- Modo dessincronizado
+			- O fluxo de chaves depende do ciphertext. Portanto, é possível inferir a chave de um bloco com base no ciphertext do bloco anterior. Por causa disso, para encriptar um bloco é necessário ter o ciphertext do anterior.
 			- Faz uso de *IV*
 			- **Gen:** recebe 1<sup>n</sup> como entrada e devolve *k* $\in$ {0, 1}<sup>n</sup> uniforme
 			- **Enc:** com chave *k* e mensagem *m*, seleciona *IV* $\in$ {0, 1}<sup>n</sup> e devolve [*IV*, GetBits(Init(*k*, *IV*), 1<sup>|m|</sup>) $\oplus$ *m*] 
 			- **Dec:** com chave *k* e ciphertext [*IV*, *c*], devolve *m* $\coloneqq$ GetBits(Init(*k*, *IV*), 1<sup>|c|</sup>) $\oplus$ *c*
 	- ### 3.6.3 - Cifras de Bloco e Modos de Operação de Cifras de Bloco
+		- Cifras de bloco são basicamente permutações pseudoaleatórias. A única diferença é que cifras de bloco normalmente não aceitam chaves de tamanho arbitrário.
+		- ECB (Electronic Code Book)
+			- Cada bloco de ciphertext é obtido pela encriptação do bloco de plaintext associado, ou seja, *c* $\coloneqq$ *F*<sub>k</sub>(*m*<sub>1</sub>) || *F*<sub>k</sub>(*m*<sub>2</sub>) || ... || *F*<sub>k</sub>(*m<sub>l</sub>*). Decriptação é apenas o processo inverso, avaliado por *F*<sub>k</sub><sup>-1</sup>
+			- Determinístico, implicando que encriptar um bloco repetidamente gera sempre o mesmo bloco cifrado
+			- Não é CPA-seguro nem EAV-seguro
+			 ![](./assets/ecb-mode.png)
+		 - CBC (Cipher Block Chaining)
+			 - O primeiro bloco de ciphertext é tido como um *IV* nonce, e o restante é gerado encriptando o XOR do bloco de mensagem *m<sub>i</sub>* com o bloco de ciphertext anterior *c<sub>i-1</sub>*, ou seja, $\forall$ *i* $\in$ {1, *l*}, *c<sub>i</sub>* $\coloneqq$  *F<sub>k</sub>*(*c<sub>i-1</sub>* $\oplus$ *m<sub>i</sub>*). Decriptação é o mesmo processo, só que avaliado em *F<sub>k</sub><sup>-1</sub>*.
+			 - **Teorema:** Se *F* é uma permutação pseudoaleatória, CBC é CPA-seguro
+			 - Chained CBC
+				 - Consiste em utilizar o último bloco de ciphertext da última mensagem encriptada como *IV* da próxima
+				 - Vulnerável para ataques CPA
+					 - Suponhamos que a primeira mensagem seja *m1*||*m2*||*m3* e que a segunda seja *m4*||*m5*. O ciphertext da primeira mensagem será *IV*||*c1*||*c2*||*c3*. Suponhamos que um atacante saiba dois valores possíveis para *m1* *m0,1* e *m1,1*. O atacante pode solicitar a encriptação de uma segunda mensagem, com *m4*  = *IV* $\oplus$ *m0,1* $\oplus$ *c3*, conseguindo que *m1* = *m0,1* $\iff$ *c4* = *c1*.
+				 - Modificar esquemas seguros, por mais que muito pouco, é extremamente perigoso e pode gerar um novo esquema extremamente vulnerável.
+			 ![](./assets/cbc-mode.png)
+		- OFB (Output Feedback)
+			- O primeiro bloco de ciphertext *c<sub>0</sub>* é o *IV* utilizado e a saída de *F<sub>k</sub>*(*y<sub>i-1</sub>*) é um *y<sub>i</sub>*. Todos os restantes blocos de ciphertext *c<sub>i</sub>* são obtidos através de *y<sub>i</sub>* $\oplus$ *m<sub>i</sub>*
+			- A mensagem não precisa ser do tamanho de um múltiplo do tamanho de bloco *n*.
+				- Como não é a mensagem que é avaliada por *F<sub>k</sub>*, basta truncar/ignorar o bloco *y<sub>i</sub>* para que tenha o mesmo tamanho que *m<sub>i</sub>* e o XOR possa ser executado.
+			- Não precisa que *F* seja invertível.
+			- Pode ser vista como uma cifra de fluxo dessincronizada.
+			- Sua versão *stateful* é segura e pode ser vista como uma cifra de fluxo sincronizada
+				- Stateful encryption consiste em compartilhar um conjunto de informações de uma leva de encriptação para a próxima. O modo Chained CBC, por exemplo, é stateful, já que utiliza o último bloco de ciphertext da mensagem anterior como *IV* da próxima a ser encriptada
+			- Se *F* é uma PRF, OFB é CPA-seguro (não é necessário utilizar uma PRP para garantir tal grau de segurança).
+			![](./assets/ofb-mode.png)
+		- CTR (Counter Mode)
+			- A partir de um *IV*, *F<sub>k</sub>* avalia *IV*||*i*, tal que *i* é o valor de um contador. Assim, cada bloco de mensagem *m<sub>i</sub>* é encriptado tal que *c<sub>i</sub>* $\coloneqq$ *m<sub>i</sub>* $\oplus$ *F<sub>k</sub>*(*IV* || *i*) = *m<sub>i</sub>* $\oplus$ *y<sub>i</sub>*
+				- É válido ressaltar que, por causa disso, a soma do tamanho do *IV* com a da representação dos valores do contador devem ser igual ao tamanho do bloco. Um *IV* maior implica em mais segurança, porém, um espaço maior para o contador implica em um maior número de blocos que podem ser encriptados sem ter necessidade de troca do *IV*.
+			- É extremamente atraente em aplicações práticas, já que pode pré computado (assim como OFB) e paralelizado, já que cada bloco é totalmente independente do resto.
+			- Se *F* é uma função pseudoaleatória, CTR é CPA-seguro para múltiplas encriptações.
+			![](./assets/ctr-mode.png)
