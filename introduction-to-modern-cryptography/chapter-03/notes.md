@@ -165,10 +165,23 @@
 			- Sua versão *stateful* é segura e pode ser vista como uma cifra de fluxo sincronizada
 				- Stateful encryption consiste em compartilhar um conjunto de informações de uma leva de encriptação para a próxima. O modo Chained CBC, por exemplo, é stateful, já que utiliza o último bloco de ciphertext da mensagem anterior como *IV* da próxima a ser encriptada
 			- Se *F* é uma PRF, OFB é CPA-seguro (não é necessário utilizar uma PRP para garantir tal grau de segurança).
+			
 			![](./assets/ofb-mode.png)
 		- CTR (Counter Mode)
 			- A partir de um *IV*, *F<sub>k</sub>* avalia *IV*||*i*, tal que *i* é o valor de um contador. Assim, cada bloco de mensagem *m<sub>i</sub>* é encriptado tal que *c<sub>i</sub>* $\coloneqq$ *m<sub>i</sub>* $\oplus$ *F<sub>k</sub>*(*IV* || *i*) = *m<sub>i</sub>* $\oplus$ *y<sub>i</sub>*
 				- É válido ressaltar que, por causa disso, a soma do tamanho do *IV* com a da representação dos valores do contador devem ser igual ao tamanho do bloco. Um *IV* maior implica em mais segurança, porém, um espaço maior para o contador implica em um maior número de blocos que podem ser encriptados sem ter necessidade de troca do *IV*.
 			- É extremamente atraente em aplicações práticas, já que pode pré computado (assim como OFB) e paralelizado, já que cada bloco é totalmente independente do resto.
-			- Se *F* é uma função pseudoaleatória, CTR é CPA-seguro para múltiplas encriptações.
+			- **Teorema:** Se *F* é uma função pseudoaleatória, CTR é CPA-seguro para múltiplas encriptações.
+				- Prova extremamente importante e apresenta estrutura recorrente. Portanto válido retomar pág 93.
+			
 			![](./assets/ctr-mode.png)
+		- Na prática, cifras de bloco são instanciadas a partir de uma *F* PRP. Porém, isso implica em uma perda de segurança concreta em função do número de chamadas de *F*. Portanto, utilizar o modo CTR com uma PRP pode se tornar facilmente inseguro.
+		- Repetição de *IV* implica na quebra da segurança de uma cifra de bloco em CTR. Por outro lado, se o *IV* não repete, mas é escolhido não uniformemente, CTR continua seguro, mas CBC torna-se totalmente vulnerável.
+	- ### 3.6.4 - Encriptação baseada em *nonce*
+		- **Definição:** Um esquema criptográfico de chave privada baseado em *nonce* é composto por algoritmos PPT (Gen, Enc, Dec) tais que:
+			- **Gen():** recebe o parâmetro de segurança 1<sup>n</sup> como entrada e devolve uma chave *k* tal que |*k*| $\ge$ *n*
+			- **Enc():** recebe a chave *k*, um *nonce* $\in$ {0, 1}<sup>*</sup> e uma mensagem *m* $\in$ {0, 1}<sup>*</sup> como entrada e devolve  um ciphertext *c*
+			- **Dec():** recebe a chave *k*, um *nonce* $\in$ {0, 1}<sup>*</sup> e um ciphertext *c* e devolve a mensagem *m* $\in$ {0, 1}<sup>*</sup>
+		- O experimento de oráculo **PrivK<sub>A, Π</sub><sup>LR-ncpa</sup>(*n*)** para esquemas baseados em *nonce* é muito parecido ao experimento de oráculo LR padrão. A única diferença é que o oráculo recebe também um *nonce* como parâmetro (LR<sub>k,b</sub>(., ., .)). Porém, é restrito para que um adversário *A* não possa repetir o uso de nenhum *nonce* durante o experimento.
+			- Um esquema criptográfico de chave privada baseado em *nonce* $\Pi$ é CPA-seguro para encriptações múltiplas se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>LR-ncpa</sup>(*n*) = 1] $\le$  1/2 + negl(*n*)**
+		- Encriptação baseada em *nonce* é útil em cenários em que gerar números aleatórios de verdade é custoso ou imprático, ou cenários em que poucas mensagens vão ser encriptadas.
