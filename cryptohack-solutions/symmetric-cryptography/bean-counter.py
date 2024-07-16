@@ -1,4 +1,5 @@
 import requests
+import Cryptodome.Util.strxor
 
 def encrypt():
     url = "https://aes.cryptohack.org/bean_counter/encrypt"
@@ -34,7 +35,7 @@ def solve():
     bCiphertext = bytes.fromhex(ciphertext)
 
     keystream_block = xor(png_header, bCiphertext[:16])
-    full_keystream = keystream_block * (len(ciphertext) // 16)
+    full_keystream = keystream_block * (len(bCiphertext) // 16)
 
     bPlaintext = xor(bCiphertext, full_keystream)
 
