@@ -1,0 +1,11 @@
+{
+  "obsidian-html-tags-autocomplete:html_autocomplete_tags-skip_over_tag_forward": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "."
+    }
+  ]
+}
