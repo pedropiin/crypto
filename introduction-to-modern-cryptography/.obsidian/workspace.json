@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "chapter-03/notes.md",
+                "file": "chapter-03/solutions.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "chapter-03/notes.md",
+                "file": "chapter-03/solutions.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "chapter-03/notes.md",
+                "file": "chapter-03/solutions.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "chapter-03/notes.md"
+                "file": "chapter-03/solutions.md"
               }
             }
           }
@@ -161,14 +161,14 @@
   },
   "active": "e13b0c63fe648ccb",
   "lastOpenFiles": [
+    "chapter-03/notes.md",
     "chapter-03/solutions.md",
-    "chapter-02/solutions.md",
     "chapter-04/notes.md",
+    "chapter-02/solutions.md",
     "chapter-04/solutions.md",
     "chapter-02/notes.md",
     "chapter-04",
     "chapter-01/notes.md",
-    "chapter-03/notes.md",
     "chapter-03/assets/ctr-mode.png",
     "chapter-03/assets/Pasted image.png",
     "chapter-03/assets/ofb-mode.png",
