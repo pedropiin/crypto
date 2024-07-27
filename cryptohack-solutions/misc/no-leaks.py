@@ -3,37 +3,41 @@ import json
 import base64
 
 def solve():
-    r = remote("socket.cryptohack.org", 13370, level="debug")
+    connection = remote("socket.cryptohack.org", 13370, level="debug")
 
-    initial_message = r.recvline().decode()
-    print("Initial message:", initial_message)
+    # Treats the "No leaks" initial message
+    connection.recvline().decode()
 
+    # First unknown byte of the flag, because the first 7 are "crypto{"
+    idx = 7
+    flag = "crypto{"
+    # Creating message request
     m = {"msg": "request"}
-    m_packet = json.dumps(m).encode()
-    r.sendline(m_packet)
+    while idx < 19:
+        used_bytes = set({})
+        while len(used_bytes) != 255:
+            # Deal with the assertion error
+            try: 
+                # Sending the request
+                connection.sendline(json.dumps(m).encode())
 
-    response = r.recvline()
-    response_json = json.loads(response.decode())
+                # Receiving the response
+                response_json = json.loads(connection.recvline().decode())
+                ciphertext_base64 = response_json["ciphertext"]
+                b_ciphertext = base64.b64decode(ciphertext_base64)
 
-    # In case of "leaky" ciphertext, the server gives us an error
-    while not response_json["ciphertext"]:
-        m = {"msg": "request"}
-        m_packet = json.dumps(m).encode()
-        r.sendline(m_packet)
+                # Add byte that appears in ciphertext to bytes that cannot be in the flag
+                used_bytes.add(b_ciphertext[idx])
+            except:
+                pass
+        ord_bytes = sorted(used_bytes)
+        for i in range(1, len(ord_bytes)):
+            if ord_bytes[i] != (ord_bytes[i - 1] + 1):
+                flag += chr(ord_bytes[i] - 1)
+        
+        idx += 1
 
-        response = r.recvline()
-        response_json = json.loads(response.decode())
-
-    encoded_ciphertext = response_json["ciphertext"]
-    print(encoded_ciphertext)
-
-    b_ciphertext = base64.b64decode(encoded_ciphertext)
-    print(b_ciphertext)
-    
-    inv = b'1' * len(b_ciphertext)
-    print(inv)
-    b_flag = bytes([a ^ b for a, b in zip(b_ciphertext, inv)])
-    flag = b_flag.decode("utf-8")
+    flag += '}'
     print(flag)
 
 
