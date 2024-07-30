@@ -1,5 +1,29 @@
 # Message Authentication Codes
 
 - ## 4.1 - Integridade de Mensagem
-	- 4.1.1 - Sigilo vs Integridade
+	- ### 4.1.1 - Sigilo vs Integridade
+		- Garantir integridade de mensagens é tão importante quanto garantir o sigilo, dependendo diretamente da aplicação e do contexto.
+		- Muitos cenários necessitam que exista algum método de garantir que as mensagens recebidas (seja por um cliente ou por um servidor) foram de fato enviadas pelo dito remetente e que não foram alteradas por um terceiro.
+	- ### 4.1.2 - Encriptação vs Autenticação de Mensagens
+		- Encriptação com base em cifras de fluxo
+			- Dado acesso à um ciphertext *c* e poder de alterá-lo, nem mesmo o sigilo perfeito garantido por um OTP é capaz de impedir que um indivíduo malicioso altere uma mensagem encriptada
+		- Encriptação com cifras de bloco
+			- ECB, além de não garantir nenhuma noção de sigilo, é vulnerável a alterações de bits e de ordem de blocos. 
+			- CBC permite alteração do IV, e portanto, do primeiro bloco de ciphertext
+- ## 4.2 - Códigos de Autenticação de Mensagem (MACs) 
+	- **Definição**: Um **código de autenticação de mensagem** (**MAC**) consiste em três algoritmos PPT (**Gen**, **Mac**, **Vrfy**) tais que
+		- 1. **Gen** é o algoritmo de geração de chaves que recebe um parâmetro de segurança 1<sup>n</sup> e devolve uma chave com |*k*| $\ge$ *n*.
+		- 2. **Mac** é o algoritmo de geração de tag que recebe uma chave *k* e uma mensagem *m* $\in$ {0, 1}<sup>*</sup> como entrada e devolve uma tag *t*. 
+			- Por poder utilizar aleatoriedade em sua construção, a notação é tida como *t* $\leftarrow$ **Mac**<sub>k</sub>(*m*)
+		- 3. **Vrfy** é o algoritmo de verificação que recebe a chave *k*, a mensagem *m* e a tag *t* como entrada e devolve um bit *b* representando a validade da tag, ou seja, *b* = 1 se é válida e *b* = 0 caso contrário.
+			- Por ser determinístico, escrevemos *b* $\coloneqq$ **Vrfy**<sub>k</sub>(*m*, *t*)
+		- $\forall$ *n*, $\forall$ *k* $\leftarrow$ Gen(1<sup>n</sup>) e $\forall$ *m* $\in$ {0, 1}<sup>*</sup>, Vrfy<sub>k</sub>(*m*, Mac<sub>k</sub>(*m*)) = 1
+		- Com criptografia simétrica, o algoritmo de geração de chave Gen(1<sup>n</sup>), por definição gera chaves *k* uniformes. Portanto, pode-se omiti-lo nesse contexto
+		- Nos casos em que os MACs são determinísticos, e, naturalmente, os algoritmos de geração de tag Mac() também são, o algoritmo de verificação Vrfy() apenas gera novamente uma tag *t*' e checa se *t*' = *t* para avaliar a validade.
+	- Segurança dos MACs
+		- Experimento de autenticação de mensagens **Mac-forge<sub>A, Π</sub>(*n*)**:
+			- 1. Uma chave *k* é gerada a partir de **Gen(1<sup>n</sup>)**
+			- 2. O adversário *A* é dado acesso ao parâmetro de segurança 1<sup>n</sup> e ao oráculo **Mac<sub>k</sub>(.)**. Eventualmente, *A* devolve um par (*m*, *t*), definindo *Q* como o conjunto de todas as consultas de *A* ao oráculo.
+			- 3. *A* é bem sucedido no experimento (o experimento tem saída = 1) $\iff$ (1) **Vrfy(*m*, *t*) = 1** e (2) *m* $\notin$ *Q*.
+		- **Definição:** Um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **inforjável existencialmente sob um ataque adaptativo de mensagens selecionadas** (é seguro) se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)
 		- 
