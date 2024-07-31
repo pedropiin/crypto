@@ -19,11 +19,36 @@
 			- Por ser determinístico, escrevemos *b* $\coloneqq$ **Vrfy**<sub>k</sub>(*m*, *t*)
 		- $\forall$ *n*, $\forall$ *k* $\leftarrow$ Gen(1<sup>n</sup>) e $\forall$ *m* $\in$ {0, 1}<sup>*</sup>, Vrfy<sub>k</sub>(*m*, Mac<sub>k</sub>(*m*)) = 1
 		- Com criptografia simétrica, o algoritmo de geração de chave Gen(1<sup>n</sup>), por definição gera chaves *k* uniformes. Portanto, pode-se omiti-lo nesse contexto
-		- Nos casos em que os MACs são determinísticos, e, naturalmente, os algoritmos de geração de tag Mac() também são, o algoritmo de verificação Vrfy() apenas gera novamente uma tag *t*' e checa se *t*' = *t* para avaliar a validade.
+		- Nos casos em que os MACs são determinísticos, e, naturalmente, os algoritmos de geração de tag Mac() também são, o algoritmo de verificação Vrfy() apenas gera novamente uma tag *t*' e checa se *t*' = *t* para avaliar a validade. Tal estratégia é chamada de **verificação canônica**.
 	- Segurança dos MACs
 		- Experimento de autenticação de mensagens **Mac-forge<sub>A, Π</sub>(*n*)**:
 			- 1. Uma chave *k* é gerada a partir de **Gen(1<sup>n</sup>)**
 			- 2. O adversário *A* é dado acesso ao parâmetro de segurança 1<sup>n</sup> e ao oráculo **Mac<sub>k</sub>(.)**. Eventualmente, *A* devolve um par (*m*, *t*), definindo *Q* como o conjunto de todas as consultas de *A* ao oráculo.
 			- 3. *A* é bem sucedido no experimento (o experimento tem saída = 1) $\iff$ (1) **Vrfy(*m*, *t*) = 1** e (2) *m* $\notin$ *Q*.
 		- **Definição:** Um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **inforjável existencialmente sob um ataque adaptativo de mensagens selecionadas** (é seguro) se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)
+		- Definição muito forte, mas importante para garantir que qualquer nova construção de MAC possa ser aplicado em qualquer aplicação e respectivo contexto.
+		- **Ataques de repetição**
+			- Ataques em que um indivíduo malicioso reenvia uma mensagem já autenticada anteriormente juntamente à sua tag.
+			- Extremamente perigoso, mas a definição de MAC não consegue evitar/proteger contra tais ataques, pois a verificação é *stateless*, ou seja, a verificação de uma mensagem não é influenciada/afetada pela verificação de outra qualquer.
+			- Proteção contra ataques de repetição deve ser garantida pela aplicação de alto nível que implementa o MAC
+				- Pode ser garantida por contadores ou por marcações de tempo concatenadas às mensagens
+		- A definição de segurança anterior garante que um adversário não consegue gerar uma tag para uma mensagem ainda não autenticada. Porém, a definição não afirma nada sobre adversários que geram uma nova tag para uma mensagem já autenticada, representando uma falha de segurança.
+		- Definimos um novo experimento, baseado em uma modificação de Mac-forge, que protege contra tal formalidade: **Mac-sforge<sub>A, Π</sub>(*n*):
+			- Definido da mesma forma que Mac-forge, porém agora o conjunto *Q* guarda os pares resultantes das consultas ao oráculo **Mac**, ou seja, (*m*, *t*) $\in$ *Q* se *t* $\leftarrow$ **Mac<sub>k</sub>(*m*)** em uma consulta de *A*. O adversário *A* é bem sucedido $\iff$ devolve um par (*m*, *t*) tal que **Vrfy<sub>k</sub>(*m*, *t*)** = 1 e (*m*, *t*) $\notin$ *Q*.
+		- **Definição:** um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **fortemente seguro** se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-sforge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)**.
+			- Se um MAC utiliza verificação canônica, ele é fortemente seguro.
+		- Existem adversários que possuem acesso também à oráculos de verificação, em que podem enviar um par (*m*, *t*) e checar se **Vrfy<sub>k</sub>(*m*, *t*)** = 1. Porém, qualquer MAC que utiliza verificação canônica e portanto é fortemente seguro, mantém-se seguro perante oráculos de verificação.
+		- **Ataque de temporização**
+			- Suponhamos um adversário *A* com acesso à um oráculo de verificação que retorna se a tag *t* é válida e também o tempo que foi necessário para tal checagem. Se a checagem da validade da tag é feita por uma função como *strncmp* de *C*, em que cada byte das strings é comparado um por vez, é possível utilizar o tempo de execução da função para reconhecer a posição do primeiro byte diferente.
+			- Se o adversário sabe os *i* primeiros bits corretos da tag *t*, pode descobrir o i+1-ésimo da seguinte forma: realiza 256 consultas ao oráculo de verificação, com 256 strings *t<sub>j</sub>* diferentes, em que a string *t<sub>j</sub>* é composta tal que os *i* primeiros bytes são os já conhecidos, o *i+1* é o valor *j* e o restante é igual 0x0. Com isso, a rotina de verificação terá um tempo de execução maior na consulta em que o byte *i+1* está correto, pois terá falhado apenas no byte *i+2*.
+			- Esse *side-channel attack* foi utilizado para "exploitar" o sistema de validação de jogos originais do Xbox 360.
+			- Portanto, algoritmos de verificação de MACs devem utilizar comparações de string em que todos os bytes são comparados juntamente.
+- ## 4.3 - Construindo Códigos de Autenticação de Mensagem Seguros
+	- ### 4.3.1 - MAC de tamanho fixo
+		- É possível construir um MAC de tamanho fixo a partir de uma função pseudoaleatória *F*<sub>k</sub>, onde a tag *t* de uma mensagem *m* é obtido através de *t* $\coloneqq$ *F*<sub>k</sub>(*m*).
+			- Se o tamanho da saída de *F*<sub>k</sub> é *n*, a probabilidade de chutar e acertar o valor da função em um ponto ainda não calculado é insignificantemente maior do que 2<sup>-n</sup>. Portanto, tal é a probabilidade de, com essa construção, acertar a tag *t* de uma mensagem *m* ainda não consultada.
+		- **Construção:** Seja *F* uma função pseudoaleatória *length preserving*. Definimos um MAC de tamanho fixo para mensagem de tamanho *n* como:
+			- 1. **Mac:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup> e uma mensagem *m* $\in$ {0, 1}<sup>n</sup> como entrada e devolve *t* $\coloneqq$ *F*<sub>k</sub>(*m*)
+			- 2. **Vrfy:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup>, a mensagem *m* $\in$ {0, 1}<sup>n</sup> e tag *t* $\in$ {0, 1}<sup>n</sup> como entrada e devolve 1 $\iff$ *t* == *F*<sub>k</sub>(*m*)
+	- ### 4.3.2 Expansão de Domínio para MACs
 		- 
