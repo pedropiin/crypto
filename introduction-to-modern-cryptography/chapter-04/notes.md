@@ -48,7 +48,28 @@
 		- É possível construir um MAC de tamanho fixo a partir de uma função pseudoaleatória *F*<sub>k</sub>, onde a tag *t* de uma mensagem *m* é obtido através de *t* $\coloneqq$ *F*<sub>k</sub>(*m*).
 			- Se o tamanho da saída de *F*<sub>k</sub> é *n*, a probabilidade de chutar e acertar o valor da função em um ponto ainda não calculado é insignificantemente maior do que 2<sup>-n</sup>. Portanto, tal é a probabilidade de, com essa construção, acertar a tag *t* de uma mensagem *m* ainda não consultada.
 		- **Construção:** Seja *F* uma função pseudoaleatória *length preserving*. Definimos um MAC de tamanho fixo para mensagem de tamanho *n* como:
-			- 1. **Mac:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup> e uma mensagem *m* $\in$ {0, 1}<sup>n</sup> como entrada e devolve *t* $\coloneqq$ *F*<sub>k</sub>(*m*)
-			- 2. **Vrfy:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup>, a mensagem *m* $\in$ {0, 1}<sup>n</sup> e tag *t* $\in$ {0, 1}<sup>n</sup> como entrada e devolve 1 $\iff$ *t* == *F*<sub>k</sub>(*m*)
+			- **Mac:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup> e uma mensagem *m* $\in$ {0, 1}<sup>n</sup> como entrada e devolve *t* $\coloneqq$ *F*<sub>k</sub>(*m*)
+			- **Vrfy:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup>, a mensagem *m* $\in$ {0, 1}<sup>n</sup> e tag *t* $\in$ {0, 1}<sup>n</sup> como entrada e devolve 1 $\iff$ *t* == *F*<sub>k</sub>(*m*)
 	- ### 4.3.2 Expansão de Domínio para MACs
-		- 
+		- É possível construir um MAC para mensagens de tamanho arbitrário a partir de um MAC de mensagens de tamanho fixo *n*
+		- **Construção:** Seja $\Pi$' = (**Mac'**, **Vrfy'**) um *fixed-length* MAC para mensagens de tamanho *n*. Podemos definir um MAC para mensagens de tamanho arbitrário como
+			- **Mac:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup> e a mensagem *m* $\in$ {0, 1}<sup>*</sup> de tamanho *l* < 2<sup>n/4</sup> como entrada. Analisa a mensagem *m* como *d* blocos *m<sub>1</sub>*,...,*m<sub>d</sub>*, cada um com tamanho *n*/4. Juntamente, escolhe um identificador uniforme de mensagem *r* $\in$ {0, 1}<sup>n/4</sup>. Para todo *i* = 1, ..., *d*, computa *t<sub>i</sub>* $\leftarrow$ **Mac'<sub>k</sub>(*r*||*l*||*i*||*m<sub>i</sub>*)**, onde *i* e *l* são representados por strings de tamanho *n*/4. Devolve a tag *t* $\coloneqq$ [*r*, *t<sub>1</sub>*, ..., *t<sub>d'</sub>*].
+			- **Vrfy:** recebe a chave *k* $\in$ {0, 1}<sup>n</sup>, a mensagem *m* $\in$ {0, 1}<sup>*</sup> de tamanho 0 < *l* < 2<sup>n/4</sup> e a tag *t* = [*r*, *t<sub>1</sub>*, ..., *t<sub>d'</sub>*]. Analisa a mensagem *m* como *d* blocos *m<sub>1</sub>*,...,*m<sub>d</sub>*, cada um com tamanho *n*/4. Devolve 1 $\iff$ *d*' = *d* e **Vrfy<sub>k</sub>(*r*||*l*||*i*||*m<sub>i</sub>*, *t<sub>i</sub>*)** = 1 para todo 1 $\le$ *i* $\le$ *d*.
+			- Se $\Pi$' é um MAC seguro para mensagens de tamanho *n*, a construção acima é um MAC seguro para mensagens de tamanho arbitrário.
+		- Estratégia extremamente imprática, vide tamanho da tag gerada e número de chamadas da cifra de bloco base.
+- ## 4.4 - CBC-MAC
+	- **Construção:** Seja *F* uma função pseudoaleatória e fixe uma função-tamanho *l*(*n*) > 0. Um CBC-MAC pode ser construído como:
+		- **Mac:** recebe como entrada *k* $\in$ {0, 1}<sup>n</sup> e a mensagem *m* de tamanho *l*(*n*) * *n*. Em seguida, analisa *m* como uma sequência de blocos *m<sub>1</sub>*,...,*m<sub>l</sub>*, com cada *m<sub>i</sub>* de tamanho *n*; e calcula *t<sub>l</sub>*, tal que *t<sub>0</sub>* $\coloneqq$ 0<sup>n</sup> e para *i* = 1,...,*l*, *t<sub>i</sub>* $\coloneqq$ *F*<sub>k</sub>(*t<sub>i-1</sub>* $\oplus$ *m<sub>i</sub>*)
+		- **Vrfy:** recebe *k* $\in$ {0, 1}<sup>n</sup>, a mensagem *m* e a tag *t* como entrada. Devolve 1 $\iff$ o tamanho de *m* = *l*(*n*) * *n* e *t* == Mac<sub>k</sub>(*m*).
+		- Se *l* é um polinômio e *F* é uma função pseudoaleatória, a construção acima é um MAC seguro para mensagens de tamanho *l*(*n*) * *n*.
+			- Nota-se que essa construção de CBC-MAC é segura para mensagens de qualquer tamanho fixo *n*. Não é segura contra mensagens de tamanho arbitrário. Portanto, deve ser utilizada apenas nos casos em que o tamanho das mensagens é pré-acordado entre remetente e destinatário.
+	 ![](./assets/cbc-mac.png)
+	 - É possível modificar em dois modos a construção de CBC-MAC apresentada para suportar mensagens de tamanho arbitrário:
+		 - 1. Concatenar o tamanho da mensagem *m* (representado por uma string de tamanho *n*) no seu início e aplicar a construção da mesma forma que foi explicitado
+		 - 2. Utilizar duas chaves ao invés de uma, tal que primeiro um tag *t* é computada normalmente com CBC-MAC através de *k<sub>1</sub>* e depois é devolvido a tag *t<sub>f</sub>* $\coloneqq$ *F*<sub>k<sub>2</sub></sub>(*t*)
+	 - // Importante acompanhar essa seção juntamente da seção 4.4.2 do livro, em que as proposições apresentadas acima e os teoremas a seguir são analisados e provados como seguros.
+		 - **Teorema 4.11:** Se *F* é uma função pseudoaleatória, então CBC é uma função pseudoaleatória desde que o conjunto das entradas com as quais é consultado é *prefix-free*. Isso significa que, para qualquer adversário diferenciador *D* PPT que consulta um oráculo com um conjunto de entradas *prefix-free*, existe uma função insignificante *negl* tal que **|P[*D*<sup>CBC<sub>k</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ *negl*(*n*)
+		 - **Teorema 4.12:** Fixe qualquer *n* $\ge$ 1. Para qualquer adversário diferenciador *D* que consulta seu oráculo com um conjunto de *q* entradas *prefix-free*, onde a maior entrada contêm *l* blocos, tem-se que **|P[*D*<sup>CBC<sub>g</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ (*q*<sup>2</sup> * *l*<sup>2</sup>) / 2<sup>n</sup>**
+			 - Implica no Teorema 4.11 por redução padrão entre funções aleatórias e pseudoaleatórias.
+ - ## 4.5 - GMAC e Poly1305
+	 - 
