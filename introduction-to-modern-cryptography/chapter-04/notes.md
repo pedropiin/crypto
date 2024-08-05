@@ -72,4 +72,46 @@
 		 - **Teorema 4.12:** Fixe qualquer *n* $\ge$ 1. Para qualquer adversário diferenciador *D* que consulta seu oráculo com um conjunto de *q* entradas *prefix-free*, onde a maior entrada contêm *l* blocos, tem-se que **|P[*D*<sup>CBC<sub>g</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ (*q*<sup>2</sup> * *l*<sup>2</sup>) / 2<sup>n</sup>**
 			 - Implica no Teorema 4.11 por redução padrão entre funções aleatórias e pseudoaleatórias.
  - ## 4.5 - GMAC e Poly1305
-	 - 
+	 - ### 4.5.1 - MACs a partir de funções universais por diferença
+		 - Uma função *h* é dita universal por diferença (do inglês, *difference-universal*) se é difícil de encontrar (a probabilidade é baixa) um par de entradas tais que suas respectivas saídas diferem por uma quantidade fixa. Formalmente:
+			 - **Definição:** uma função chaveada *h* é dita $\epsilon$(*n*)-universal por diferença ($\epsilon$(*n*)*-difference universal*) se para todo *n*, para quaisquer *m* e *m*' $\in$ *M<sub>n</sub>* e para qualquer $\Delta$ $\in$ *T<sub>n</sub>*, tem-se que **P[*h*<sub>k</sub>(*m*) - *h*<sub>k</sub>(*m*') = $\Delta$ ] $\le$ $\epsilon$(*n*)**
+		 - A principal desvantagem de construções de CBC-MAC é que ainda sim são muito ineficientes, necessitando de uma quantidade linear de avaliações da cifra de bloco base para computar apenas uma tag. 
+		 - Podemos construir um MAC baseado em uma função universal por diferença e uma função pseudoaleatória muito mais eficiente
+		 - **Construção 4.15:** Seja *h* uma função $\epsilon$(*n*)-universal por diferença ($\epsilon$(*n*)-*difference universal*) e *F* uma função pseudoaleatória. Temos um MAC para mensagens em {*M<sub>n</sub>*} com:
+			 - **Gen:** recebe como entrada 1<sup>n</sup>, seleciona uniformemente *k<sub>h</sub>* $\in$ *K<sub>n</sub>* e *k<sub>f</sub>* $\in$ {0, 1}<sup>n</sup> e devolve a chave (*k<sub>h</sub>*, *k<sub>f</sub>*)
+			 - **Mac:** recebe como entrada a chave (*k<sub>h</sub>*, *k<sub>f</sub>*) e a mensagem *m* $\in$ *M<sub>n</sub>*. Seleciona *r* $\in$ {0, 1}<sup>n</sup> uniforme e devolve a tag *t* $\coloneqq$ [*r*, *h*<sub>k<sub>h</sub></sub>(*m*) + *F*<sub>k<sub>f</sub></sub>(*r*)]
+			 - **Vrfy:** recebe como entrada a chave (*k<sub>h</sub>*, *k<sub>f</sub>*), a mensagem *m* $\in$ *M<sub>n</sub>* e a tag *t* = [*r*, *s*]. Devolve 1 $\iff$ *s* == *h*<sub>k<sub>h</sub></sub>(*m*) + *F*<sub>k<sub>f</sub></sub>(*r*)
+			 - Se *h* é de fato uma função $\epsilon$(*n*)-universal por diferença ($\epsilon$(*n*)-*difference universal*) e *F* uma função pseudoaleatória, a construção acima é fortemente segura para mensagens em {*M*<sub>n</sub>}.
+	 - ### 4.5.2 - Instanciações
+		 - Exemplo de função $\epsilon$-universal por diferença:
+			 - Intuição: Fixe um corpo finito (corpo de Galois) $\mathbb{F}$. A ideia é representar a chave *k* $\in$ *K* como um ponto em $\mathbb{F}$ e a mensagem *m* $\in$ *M* como um polinômio em $\mathbb{F}$, tal que computar *h*<sub>k</sub>(*m*) é o equivalente a computar *m*.
+			 - Definição: fixe uma constante *l* e seja *M* = $\mathbb{F}$<sup>&lt;l</sup>, ou seja, *M* é um conjunto de vetores em $\mathbb{F}$ com o número de entradas menor do que *l*. Para qualquer mensagem *m* = (*m*<sub>1</sub>, ..., *m*<sub>l'-1</sub>) $\in$ *M*, com *l*' $\le$ *l*, tome *m*<sub>l'</sub> $\in$ $\mathbb{F}$ como uma representação do tamanho de *m*. Defina o polinômio *m*(*X*) $\equiv$ *m*<sub>1</sub> * *X*<sup>l'</sup> + *m*<sub>2</sub> * *X*<sup>l'-1</sup> + ... + *m*<sub>l'</sub> * *X*. Por fim, defina a função chaveada *h* : $\mathbb{F}$ x $\mathbb{F}$<sup>&lt;l</sup> $\rightarrow$ $\mathbb{F}$ como ***h*<sub>k</sub>(*m*) = *m*(*k*)**
+			 - A função *h* acima é provada como *l*/|$\mathbb{F}$|-universal por diferença.
+			 - É uma função muito eficiente, já que permite que a chave seja muito menor do que a entrada (mais precisamente, seja equivalente à um ponto em $\mathbb{F}$) e também pode ser calculada com o método de Horner.
+		 - **GMAC**
+			 - MAC construído a partir da Construção 4.15, utilizando uma função pseudoaleatória com bloco de 128 bits e uma função universal por diferença sobre o corpo $\mathbb{F}$<sub>2<sup>128</sup></sub>.
+			 - Como cada elemento do corpo é uma string de 128 bits, adição e multiplicação são implementadas com lógica binária.
+		 - **Poly1305**
+			 - Construída semelhantemente ao GMAC, mas sobre o corpo finito $\mathbb{F}$<sub>p</sub>, com *p* = 2<sup>130</sup> - 5. Portanto, agora as operações são definidas assim como no corpo.
+- ## 4.6 - MAC Informação-Teórico
+	- Experimento **Mac-forge<sub>A, Π</sub><sup>1-time</sup>**:
+		- 1. A chave *k* é gerada a partir de **Gen()**
+		- 2. O adversário *A* seleciona mensagem *m*'e recebe *t*' $\leftarrow$ **Mac<sub>k</sub>(*m*')**
+		- 3. O adversário *A* devolve (*m*, *t*)
+		- 4. A saída do experimento é 1 $\iff$ **Vrfy<sub>k</sub>(*m*, *t*)** = 1 e *m* $\neq$ *m*'
+	- **Definição:** Um MAC $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é $\epsilon$-seguro para uso único se para todo adversário *A*, até para os com tempo ilimitado, tem-se **P[Mac-forge<sub>A, Π</sub><sup>1-time</sup> = 1] $\le$ $\epsilon$
+	- **Definição:** Uma função *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ é **fortemente universal** se $\forall$ *m*, *m*' $\in$ $\mathcal{M}$ com *m* $\neq$ *m*' e $\forall$ *t*, *t*' $\in$ $\mathcal{T}$, tem-se que **P[*h*<sub>k</sub>(*m*) = *t* $\wedge$ *h*<sub>k</sub>(*m*') = *t*'] = 1/|$\mathcal{T}$|<sup>2</sup>.
+		- A intuição é que mesmo após observar *t* = *h*<sub>k</sub>(*m*), um adversário não ganha nenhuma informação sobre *h*<sub>k</sub>(*m*) nem sobre qualquer outra tag. Ou seja, do ponto de vista do adversário, todas as outras tags *t*' $\in$ $\mathcal{T}$ estão uniformemente distribuídas ainda.
+	- Por consequência, temos a seguinte construção: seja *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ uma função fortemente universal. Temos um MAC para mensagens em $\mathcal{M}$ com:
+		- **Gen**: devolve uma chave *k* $\in$ $\mathcal{K}$ uniformemente selecionada
+		- **Mac:** recebe a chave *k* $\in$ $\mathcal{K}$ e a mensagem *m* $\in$ $\mathcal{M}$ como entrada e devolve a tag *t* $\coloneqq$ *h*<sub>k</sub>(*m*)
+		- **Vrfy**: recebe a chave *k* $\in$ $\mathcal{K}$, a mensagem *m* $\in$ $\mathcal{M}$ e a tag *t* $\in$ $\mathcal{T}$ como entrada e devolve 1 $\iff$ *t* == *h*<sub>k</sub>(*m*)
+		- Se *h* é uma função fortemente segura, a construção acima é um MAC 1/|$\mathcal{T}$|-seguro de uso único para mensagens em $\mathcal{M}$.
+	- **Teorema**: Para qualquer número primo *p*, a função *h* a seguir é fortemente universal: ***h*<sub>a, b</sub>(*m*) $\stackrel{\text{def}}{=}$ [*a* * *m* + *b* mod *p*]
+	- **Construção**: Seja *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ uma função universal por diferença (*difference-universal*). Temos um MAC para mensagens em $\mathcal{M}$ com
+		- **Gen:** seleciona uma chave *k* $\in$ $\mathcal{K}$ uniforme e um *r* $\in$ $\mathcal{T}$ e devolve chave (*k*, *r*).
+		- **Mac:** recebe a chave (*k*, *r*) e a mensagem *m* $\in \mathcal{M}$ como entrada e devolve a tag *t* $\coloneqq$ *h*<sub>k</sub>(*m*) + *r*
+		- **Vrfy:** recebe (*k*, *r*), a mensagem *m* $\in \mathcal{M}$ e a chave *t* $\in \mathcal{T}$ como entrada e devolve 1 $\iff$ *t* == *h*<sub>k</sub>(*m*) + *r*
+	- Limitações
+		- É possível provar que qualquer MAC $\epsilon$-seguro para *l*-vezes (utilizado para autenticar *l* mensagens) necessita que |*k*| $\ge$ 1/$\epsilon$<sup>(l+1)</sup>.
+			- Nenhum MAC pode ser construído tendo segurança informação-teórica um número ilimitado de mensagens.
