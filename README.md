@@ -24,7 +24,7 @@ Repository to store notes, exercises, challenges, implementations and other thin
 ## Algorithms
 - [AES-128](implementations/aes.cpp)
 
-- [Tonneli-Shanks Algorithm](implementations/tonneli-shanks.py)
+- [Tonneli-Shanks Algorithm](implementations/tonneli_shanks.py)
 
-- [E.E.A](implementations/extended-euclidean-algorithm.py)
+- [E.E.A](implementations/extended_euclidean_algorithm.py)
 	 
