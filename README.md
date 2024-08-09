@@ -18,6 +18,8 @@ Repository to store notes, exercises, challenges, implementations and other thin
 
 - [RSA](cryptohack-solutions/rsa)
 
+- [Diffie-Hellman](cryptohack-solutions/diffie-hellman)
+
 - [Misc](cryptohack-solutions/misc)
 
 
