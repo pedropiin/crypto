@@ -25,7 +25,7 @@
 			- 1. Uma chave *k* é gerada a partir de **Gen(1<sup>n</sup>)**
 			- 2. O adversário *A* é dado acesso ao parâmetro de segurança 1<sup>n</sup> e ao oráculo **Mac<sub>k</sub>(.)**. Eventualmente, *A* devolve um par (*m*, *t*), definindo *Q* como o conjunto de todas as consultas de *A* ao oráculo.
 			- 3. *A* é bem sucedido no experimento (o experimento tem saída = 1) $\iff$ (1) **Vrfy(*m*, *t*) = 1** e (2) *m* $\notin$ *Q*.
-		- **Definição:** Um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **inforjável existencialmente sob um ataque adaptativo de mensagens selecionadas** (é seguro) se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)
+		- **Definição:** Um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **inforjável existencialmente sob um ataque adaptativo de mensagens selecionadas**, ou seja, **é seguro**, se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)
 		- Definição muito forte, mas importante para garantir que qualquer nova construção de MAC possa ser aplicado em qualquer aplicação e respectivo contexto.
 		- **Ataques de repetição**
 			- Ataques em que um indivíduo malicioso reenvia uma mensagem já autenticada anteriormente juntamente à sua tag.
