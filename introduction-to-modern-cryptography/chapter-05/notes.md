@@ -10,4 +10,60 @@
 				- Se *b* = 4, é adicionado ao final da mensagem os bytes 0x04040404.
 				- A mensagem antes de ser encriptada, com o padding adicionado, é chamada de codificada.
 			- Decriptação usando PKCS funciona normalmente: o ciphertext é decriptado e depois há uma checagem para ver se o padding é válido, isto é, se o último byte *b* é repetido *b* vezes no final. Caso não seja, a função devolve um erro.
-		- 
+		- Utilizando o modo CBC em uma cifra de bloco, temos que *m<sub>2</sub>* = *F<sub>k</sub><sup>-1</sup>*(*c<sub>2</sub>*) $\oplus$ *c<sub>1</sub>*. Se *c'<sub>1</sub>* é igual a *c<sub>1</sub>*, apenas com o *i*-ésimo bit alterado, decriptar as mensagens gera *m'<sub>1</sub>* e *m'<sub>2</sub>* com *m'<sub>2</sub>* = *F<sub>k</sub><sup>-1</sup>*(*c<sub>2</sub>*) $\oplus$ *c'<sub>1</sub>*, ou seja, *m'<sub>2</sub>* só vai ser diferente de *m<sub>2</sub>* pelo *i*-ésimo bit. Generalizando, tem-se que, para qualquer string $\Delta$, *c'<sub>1</sub>* = *c<sub>1</sub>* $\oplus$ $\Delta$ e juntamente *m'<sub>2</sub>* = *m<sub>2</sub>* $\oplus$ $\Delta$.
+			- Um atacante pode utilizar tal propriedade para descobrir o tamanho original da mensagem, juntamente com seus últimos bits.
+		- Um atacante altera o primeiro byte de *c<sub>1</sub>* e envia o ciphertext *IV*, *c'<sub>1</sub>*, *c<sub>2</sub>* para o servidor. Se a decriptação falhar, significa que o servidor está checando todos os bytes de *m<sub>2</sub>*, e, portanto, *b* = *L*. Caso contrário, o adversário sabe que *b* < *L* e pode repetir o processo alterando os próximos bytes, um por vez, até descobrir *b*.
+		- Tendo conhecimento de *b* torna-se muito fácil para o adversário descobrir os bytes da mensagem. Primeiramente define $\Delta$<sub>i</sub> = 0x00...0x00 0x*i* 0x(*b*+1) ... 0x(b+1) $\oplus$ 0x00 ... 0x00 0x00 0x*b* ... 0x*b*, com os bytes 0x(*b*+1) e 0x*b* repetidos *b* vezes. Ao submeter *IV*, *c<sub>1</sub>* $\oplus$ $\Delta$<sub>i</sub>, *c<sub>2</sub>* ao servidor, os últimos *b* bytes de *m'<sub>2</sub>* serão 0x(*b*+1) e o byte final da mensagem será 0x(*M*$\oplus$*i*), onde *M* é o byte final da mensagem original. A decriptação só vai ser bem sucedida $\iff$ 0x(*M*$\oplus$*i*) = 0x(*b*+1). Testando todos os 2<sup>8</sup> casos possíveis, o adversário descobre o último byte da mensagem original.
+			- Ataque funcional contra CAPTCHAs.
+	- 5.1.2 - Definindo Segurança-CCA
+		- Experimento de indistinguibilidade contra CCA **PrivK<sub>A, Π</sub><sup>cca</sup>(*n*)**:
+			- 1. Uma chave *k* é gerada por Gen(1<sup>n</sup>).
+			- 2. O adversário *A* recebe 1<sup>n</sup>, acesso aos oráculos Enc<sub>k</sub>(.) e Dec<sub>k</sub>(.) e devolve duas mensagem *m<sub>0</sub>* e *m<sub>1</sub>*.
+			- 3. O experimento seleciona um bit *b* $\in$ {0, 1} uniforme e devolve para *A* um ciphertext de desafio *c* $\leftarrow$ Enc<sub>k</sub>(*m<sub>b</sub>*).
+			- 4. O adversário *A* continua com acesso aos oráculos, mas não pode consultá-los com o ciphertext desafio. Em algum momento, deve devolver como resposta um bit *b'*.
+			- 5. O experimento é bem sucedido e tem saída 1 $\iff$ *b'* == *b*, onde falamos que *A* foi bem sucedido no experimento
+		- **Definição:** Um esquema criptográfico de chave privada $\Pi$ tem **encriptações indistinguíveis perante um ataque de texto cifrado escolhido (CCA)**, ou é **CCA-seguro**, se para qualquer adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>cca</sup>(*n*) = 1] $\le$ 1/2 + *negl***.
+			- Se um esquema tem encriptações indistinguíveis perante um CCA, tem também múltiplas encriptações indistinguíveis perante um CCA.
+			- Para que um esquema seja CCA-seguro, ele deve ser **não-maleável**, isto é, qualquer modificação em algum ciphertext resulta em uma decriptação completamente não relacionada à original.
+- ## 5.2 - Encriptação Autenticada
+	- Experimento de inforjabilidade de encriptação **Enc-Forge<sub>A, Π</sub>(*n*):**
+		- 1. Uma chave *k* é gerada por Gen(1<sup>n</sup>)
+		- 2. O adversário *A* recebe 1<sup>n</sup> e acesso a um oráculo de encriptação Enc<sub>k</sub>(.). Seja *Q* o conjunto de consultas de *A* ao oráculo e *m* $\coloneqq$ Dec<sub>k</sub>(.). Eventualmente *A* devolve um ciphertext *c*.
+		- 3. *A* é bem sucedido (saída do experimento é 1) $\iff$ (1) *m* $\neq$ $\bot$ e (2) *m* $\notin$ *Q*.
+	- **Definição:** Um esquema criptográfico de chave privada $\Pi$ é **inforjável** se para qualquer adversário *A* PPT existe uma função *negl* tal que **P[Enc-Forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl***.
+	- **Definição 5.3:** Um esquema criptográfico de chave privada é um **esquema de encriptação autenticada (AE)** se ele é *CCA-seguro* e *inforjável*.
+	- Experimento de encriptação autenticada **PrivK<sub>A, $\Pi$</sub><sup>ae</sup>(*n*):**
+		- 1. Uma chave *k* é gerada a partir de Gen(1<sup>n</sup>) e um bit uniforme *b* $\in$ {0, 1} é selecionado
+		- 2. O adversário *A* recebe 1<sup>n</sup> e é dado acesso à dois oráculos:
+			- (a) *b = 0*: *A* recebe acesso a Enc<sub>k</sub>(.) e Dec<sub>k</sub>(.)
+			- (b) *b = 1*: *A* recebe acesso a Enc<sub>k</sub><sup>0</sup>(.) e Dec<sub>$\bot$</sub>(.)
+		- 3. O adversário devolve como resposta um bit *b'*
+		- 4. A saída do experimento é 1 $\iff$ *b'* == *b*. Dizemos nesse caso que o adversário *A* foi bem sucedido.
+		- Obviamente, o adversário *A* não tem permissão para consultar o oráculo Dec(.) com a saída de uma consulta ao oráculo Enc, pois assim tem-se um método de distinção trivial.
+	- **Definição 5.4:** Um esquema criptográfico de chave privada é um **esquema de encriptação autenticada (AE)** se para qualquer adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>ae</sup>(*n*) = 1] $\le$ 1/2 + *negl***.
+	- **Teorema 5.5:** Um esquema de encriptação de chave privada satisfaz a Definição 5.3 $\iff$ satisfaz a Definição 5.4.
+	- Existem casos em que mensagens *m* vem acompanhadas de informação extra associada (AD), como *headers*, que muitas vezes não necessitam de sigilo, apenas de integridade. 
+		- Avaliando entre simplicidade e eficiência, é necessário decidir sobre encriptar ou não tal informação associada. 
+		- Esquemas AE que suportam informação associada são chamados de AEAD (do inglês, *authenticated encryption with associated data*).
+	- Todo esquema de encriptação CCA-seguro é também AE, mas o inverso não é verdade.
+		- Existem contextos em que integridade não é necessária, e basta, portanto, utilizar um esquema CCA-seguro, mas não há motivos nem vantagens nisso, já que não existem construções mais eficientes que garantam apenas sigilo. Portanto, por mais que ambas definições sejam diferentes, em casos gerais, utiliza-se uma construção AE.
+- ## 5.3 - Esquemas de Autenticação Encriptada
+	- 5.3.1 - Construções Genéricas
+		- Buscamos abordagens cuja segurança seja baseada na de seus componentes, e, portanto, é segura para qualquer instanciação e implementação de componentes provadamente seguros.
+			- Basear a segurança em detalhes de implementação de componentes é extremamente perigoso.
+		- Aqui adoto *k<sub>E</sub>* e *k<sub>M</sub>* como as chaves para o esquema de encriptação $\Pi$<sub>E</sub> = (Enc, Dec) CPA-seguro e para o MAC $\Pi$<sub>M</sub> = (Mac, Vrfy) fortemente seguro, respectivamente.
+		- *Encrypt-and-authenticate* (E&M)
+			- Encriptação e autenticação de mensagens são realizadas separadamente, em paralelo. 
+				- Dada uma mensagem *m*, o remetente envia o par [*c*, *t*], tal que *c* $\leftarrow$ Enc<sub>k<sub>E</sub></sub>(*m*) e *t* $\leftarrow$ Mac<sub>k<sub>M</sub></sub>(*m*). 
+				- O recebedor decripta *c* para obter *m* e depois verifica a tag *t* a partir de Vrfy<sub>k<sub>M</sub></sub>(*m*, *t*).
+			- Extremamente problemática, já que não consegue garantir sigilo.
+				- Muitos MACs, mesmo que fortemente seguros, não garantem nenhum nível de sigilo. Então a tag *t* resultante pode vazar informações sobre a mensagem *m*.
+				- Com MACs determinísticos (muitos dos casos dos padronizados), E&M não consegue garantir segurança CPA, já que tags são fixas para cada mensagem, propriedade essa que contradiz segurança CPA.
+		- *Authenticate-then-encrypt* (AtE)
+			- Autenticação é realizada antes de tudo e depois a mensagem é encriptada juntamente à tag. 
+				- Dada uma mensagem *m*, o remetente envia o par [*c*, *t*], tal que *t* $\leftarrow$ Mac<sub>k<sub>M</sub></sub>(*m*) e *c* $\leftarrow$ Enc<sub>k<sub>E</sub></sub>(*m*||*t*).
+				- O recebedor decripta *c* para obter *m*||*t* e depois verifica a tag *t* a partir de Vrfy<sub>k<sub>M</sub></sub>(*m*, *t*).
+		- *Encrypt-then-authenticate* (EtA)
+			- Encriptação é realizada primeiro e depois a tag é calculada a partir do resultado.
+				- Dada uma mensagem *m*, o remetente envia o par [*c*, *t*], tal que *c* $\leftarrow$ Enc<sub>k<sub>E</sub></sub>(*m*) e *t* $\leftarrow$ Mac<sub>k<sub>M</sub></sub>(*c*).
+				- Agora, o recebedor decripta verifica a tag com Vrfy<sub>k<sub>M</sub></sub>(*c*, *t*), e caso a saída seja 1, decripta *c* para obter a mensagem *m*.

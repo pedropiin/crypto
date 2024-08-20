@@ -56,7 +56,7 @@
 			- Não faz sentido chamar uma string de pseudoaleatória, já que se trata de uma característica para uma distribuição de strings.
 		- **Definição:** Seja *G* um algoritmo polinomial determinístico tal que $\forall$ *n* e $\forall$ *s* $\in$ {0, 1}<sup>n</sup>, *G(s)* retorna uma string de tamanho *l(n)*. *G* é **pseudoaleatório** $\iff$ 
 			- (Expansão): $\forall$ *n*, *l(n)* > *n* 
-			- (Pseudoaleatoriedade): Para todo algoritmo *D* PPT, existe uma função insignificante *negl* tal que **|P[*D*(*G*(*s*)) = 1] - P[*D*(*r*) = 1]| $\le$ *negl*(*n*) 
+			- (Pseudoaleatoriedade): Para todo algoritmo *D* PPT, existe uma função insignificante *negl* tal que **|P[*D*(*G*(*s*)) = 1] - P[*D*(*r*) = 1]| $\le$ *negl*(*n*)**.
 		- É trivial diferenciar uma string verdadeiramente aleatória de uma string pseudoaleatória dado tempo ilimitado com um algoritmo exponencial.
 			- Se *G* recebe uma *seed* de tamanho *n* e devolve uma string de tamanho 2*n*, significa que *G* consegue gerar no máximo 2<sup>n</sup> strings de tamanho 2*n*, sendo que, obviamente, existem 2<sup>2n</sup> strings de tamanho 2*n*.
 	- Utilizar reduções em provas e análises de segurança de esquemas criptográficos é um método extremamente prático. A ideia é provar que um esquema criptográfico é seguro assumindo que, por exemplo, um algoritmo *G* é um gerador pseudoaleatório, ao invés de provar a segurança incondicional de uma construção.
@@ -66,14 +66,14 @@
 
 - ## 3.4 - Definições fortes de Segurança 
 	- ### 3.4.1 - Segurança para encriptações múltiplas
-		- Experimento de ouvinte escondido para múltiplas mensagens **PrivK<sub>A, Π</sub><sup>mult</sup>(*n):**
+		- Experimento de ouvinte escondido para múltiplas mensagens **PrivK<sub>A, Π</sub><sup>mult</sup>(*n*):**
 			- Adversário *A* recebe como entrada o parâmetro de segurança 1<sup>n</sup> e devolve duas listas de tamanho igual, com *M0* = (*m<sub>0,1</sub>*, ..., *m<sub>0, t</sub>*) e *M1* =(*m<sub>1, 1</sub>*, ..., *m<sub>1, t</sub>*), tal que $\forall$ i, |*m<sub>0,i</sub>*| = |*m<sub>1,i</sub>*|
 			- *k* $\leftarrow$ Gen(1<sup>n</sup>) e escolhe-se *b* $\in$ {0, 1}. $\forall$ i, *c<sub>i</sub>* $\leftarrow$ Enc<sub>k</sub>(*m<sub>b, i</sub>*) tal que *C* = (c<sub>1</sub>, ..., c<sub>t</sub>) é dado para *A*
 			- *A* escolhe *b'* tal que a saída do experimento é 1 $\iff$ *b'* = *b*, e 0 caso contrário.
 		- **Definição:** Um esquema criptográfico $\Pi$ = (Gen, Enc, Dec) tem **múltiplas encriptações indistinguíveis perante um ouvinte escondido** se $\forall$ adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>mult</sup>(*n*) = 1] $\le$ 1/2 + negl(*n*)**
 		- Se um esquema criptográfico tem sua função de encriptação Enc determinística, tal esquema não tem segurança para múltiplas encriptações
 	- ### 3.4.2 - Segurança-CPA
-		- Experimento de indistinguibilidade contra CPA **PrivK<sub>A, Π</sub><sup>cpa</sup>(*n):**
+		- Experimento de indistinguibilidade contra CPA **PrivK<sub>A, Π</sub><sup>cpa</sup>(*n*):**
 			- *k* $\leftarrow$ Gen(1<sup>n</sup>)
 			- *A* recebe 1<sup>n</sup> e Enc<sub>k</sub>(.) como oráculo e devolve *m<sub>0</sub>* e *m<sub>1</sub>* tal que |*m<sub>0</sub>*| = |*m<sub>1</sub>*| 
 			- *b* é escolhido e *c* $\leftarrow$ Enc<sub>k</sub>(*m*<sub>b</sub>) é devolvido para *A* 
@@ -82,7 +82,7 @@
 		- **Definição:** Um esquema criptográfico $\Pi$ = (Gen, Enc, Dec) tem **encriptações indistinguíveis perante um CPA (é CPA-seguro)** se $\forall$ adversário *A* PPT existe uma função insignificante *negl* tal que **P[PrivK<sub>A, Π</sub><sup>cpa</sup>(*n*) = 1] $\le$ 1/2 + negl(n)**
 	- ### 3.4.3 - Segurança-CPA para múltiplas encriptações
 		- Um oráculo LR<sub>k,b</sub> devolve *c* $\leftarrow$ Enc<sub>k</sub>(*m*<sub>b</sub>), dadas duas mensagens *m0* e *m1* e um bit *b* escolhido uniformemente. Se *b* = 0, o adversário *A* sempre recebe a encriptação da mensagem da esquerda (nesse caso, *m0*), e caso *b* = 1, recebe a encriptação da mensagem da direita.
-		- Experimento de indistinguibilidade contra CPA **PrivK<sub>A, Π</sub><sup>LR-cpa</sup>(*n):**
+		- Experimento de indistinguibilidade contra CPA **PrivK<sub>A, Π</sub><sup>LR-cpa</sup>(*n*):**
 			- *k* $\leftarrow$ Gen(1<sup>n</sup>)
 			- *A* recebe 1<sup>n</sup> e LR<sub>k,b</sub>(., .) como oráculo e devolve *m<sub>0</sub>* e *m<sub>1</sub>* tal que |*m<sub>0</sub>*| = |*m<sub>1</sub>*| 
 			- *b* é escolhido e *c* $\leftarrow$ LR<sub>k,b</sub>(*m*<sub>b</sub>) é devolvido para *A* 
@@ -117,9 +117,9 @@
 			- **Init():** recebe como entrada uma seed *s* uniforme e opcionalmente um *IV* e devolve um estado inicial *st*
 			- **Next():** recebe o estado atual *st* e devolve um bit *y* junto com o estado atualizado *st'*
 		- Podemos definir um algoritmo **GetBits()** que, com um parâmetro *l* chama **Init** e depois **Next** *l* vezes, de modo a receber uma string *y* de tamanho *l*
-		- Temos um PRG a partir de uma cifra de fluxo com ***G*<sup>l</sup>(*s*) = GetBits(Init(*s*), 1<sup>l</sup>)
+		- Temos um PRG a partir de uma cifra de fluxo com ***G*<sup>l</sup>(*s*) = GetBits(Init(*s*), 1<sup>l</sup>)**
 			- A cifra é segura se *G<sup>l</sup>* é um PRG para algum *l* polinomial
-		- Temos uma PRF a partir de uma cifra de fluxo com ***F<sub>s</sub><sup>l</sup>*(*IV*) = GetBits(Init(*s*, *IV*), 1<sup>l</sup>)
+		- Temos uma PRF a partir de uma cifra de fluxo com ***F<sub>s</sub><sup>l</sup>*(*IV*) = GetBits(Init(*s*, *IV*), 1<sup>l</sup>)**
 			- A cifra é segura de *F<sup>l</sup>* é uma função pseudoaleatória para um *l* polinomial
 		- É possível construir cifras de fluxo a partir de funções pseudoaleatórias
 			- Seja *F* uma função pseudoaleatória. Se **Init** aceita um *IV* de tamanho 3*n*/4 e **Next** devolve *n* bits por rodada, temos uma cifra de fluxo (**Init**, **Next**) com:

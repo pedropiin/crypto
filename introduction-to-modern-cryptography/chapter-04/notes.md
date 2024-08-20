@@ -25,7 +25,7 @@
 			- 1. Uma chave *k* é gerada a partir de **Gen(1<sup>n</sup>)**
 			- 2. O adversário *A* é dado acesso ao parâmetro de segurança 1<sup>n</sup> e ao oráculo **Mac<sub>k</sub>(.)**. Eventualmente, *A* devolve um par (*m*, *t*), definindo *Q* como o conjunto de todas as consultas de *A* ao oráculo.
 			- 3. *A* é bem sucedido no experimento (o experimento tem saída = 1) $\iff$ (1) **Vrfy(*m*, *t*) = 1** e (2) *m* $\notin$ *Q*.
-		- **Definição:** Um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **inforjável existencialmente sob um ataque adaptativo de mensagens selecionadas**, ou seja, **é seguro**, se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)
+		- **Definição:** Um código de autenticação de mensagem $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é **inforjável existencialmente sob um ataque adaptativo de mensagens selecionadas**, ou seja, **é seguro**, se para todo adversário *A* PPT, existe uma função insignificante *negl* tal que **P[Mac-forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl*(*n*)**
 		- Definição muito forte, mas importante para garantir que qualquer nova construção de MAC possa ser aplicado em qualquer aplicação e respectivo contexto.
 		- **Ataques de repetição**
 			- Ataques em que um indivíduo malicioso reenvia uma mensagem já autenticada anteriormente juntamente à sua tag.
@@ -68,7 +68,7 @@
 		 - 1. Concatenar o tamanho da mensagem *m* (representado por uma string de tamanho *n*) no seu início e aplicar a construção da mesma forma que foi explicitado
 		 - 2. Utilizar duas chaves ao invés de uma, tal que primeiro um tag *t* é computada normalmente com CBC-MAC através de *k<sub>1</sub>* e depois é devolvido a tag *t<sub>f</sub>* $\coloneqq$ *F*<sub>k<sub>2</sub></sub>(*t*)
 	 - // Importante acompanhar essa seção juntamente da seção 4.4.2 do livro, em que as proposições apresentadas acima e os teoremas a seguir são analisados e provados como seguros.
-		 - **Teorema 4.11:** Se *F* é uma função pseudoaleatória, então CBC é uma função pseudoaleatória desde que o conjunto das entradas com as quais é consultado é *prefix-free*. Isso significa que, para qualquer adversário diferenciador *D* PPT que consulta um oráculo com um conjunto de entradas *prefix-free*, existe uma função insignificante *negl* tal que **|P[*D*<sup>CBC<sub>k</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ *negl*(*n*)
+		 - **Teorema 4.11:** Se *F* é uma função pseudoaleatória, então CBC é uma função pseudoaleatória desde que o conjunto das entradas com as quais é consultado é *prefix-free*. Isso significa que, para qualquer adversário diferenciador *D* PPT que consulta um oráculo com um conjunto de entradas *prefix-free*, existe uma função insignificante *negl* tal que **|P[*D*<sup>CBC<sub>k</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ *negl*(*n*)**
 		 - **Teorema 4.12:** Fixe qualquer *n* $\ge$ 1. Para qualquer adversário diferenciador *D* que consulta seu oráculo com um conjunto de *q* entradas *prefix-free*, onde a maior entrada contêm *l* blocos, tem-se que **|P[*D*<sup>CBC<sub>g</sub>(.)</sup>(1<sup>n</sup>) = 1] - P[*D*<sup>f(.)</sup>(1<sup>n</sup>) = 1]| $\le$ (*q*<sup>2</sup> * *l*<sup>2</sup>) / 2<sup>n</sup>**
 			 - Implica no Teorema 4.11 por redução padrão entre funções aleatórias e pseudoaleatórias.
  - ## 4.5 - GMAC e Poly1305
@@ -99,15 +99,15 @@
 		- 2. O adversário *A* seleciona mensagem *m*'e recebe *t*' $\leftarrow$ **Mac<sub>k</sub>(*m*')**
 		- 3. O adversário *A* devolve (*m*, *t*)
 		- 4. A saída do experimento é 1 $\iff$ **Vrfy<sub>k</sub>(*m*, *t*)** = 1 e *m* $\neq$ *m*'
-	- **Definição:** Um MAC $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é $\epsilon$-seguro para uso único se para todo adversário *A*, até para os com tempo ilimitado, tem-se **P[Mac-forge<sub>A, Π</sub><sup>1-time</sup> = 1] $\le$ $\epsilon$
-	- **Definição:** Uma função *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ é **fortemente universal** se $\forall$ *m*, *m*' $\in$ $\mathcal{M}$ com *m* $\neq$ *m*' e $\forall$ *t*, *t*' $\in$ $\mathcal{T}$, tem-se que **P[*h*<sub>k</sub>(*m*) = *t* $\wedge$ *h*<sub>k</sub>(*m*') = *t*'] = 1/|$\mathcal{T}$|<sup>2</sup>.
+	- **Definição:** Um MAC $\Pi$ = (**Gen**, **Mac**, **Vrfy**) é $\epsilon$-seguro para uso único se para todo adversário *A*, até para os com tempo ilimitado, tem-se **P[Mac-forge<sub>A, Π</sub><sup>1-time</sup> = 1] $\le$ $\epsilon$**
+	- **Definição:** Uma função *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ é **fortemente universal** se $\forall$ *m*, *m*' $\in$ $\mathcal{M}$ com *m* $\neq$ *m*' e $\forall$ *t*, *t*' $\in$ $\mathcal{T}$, tem-se que **P[*h*<sub>k</sub>(*m*) = *t* $\wedge$ *h*<sub>k</sub>(*m*') = *t*'] = 1/|$\mathcal{T}$|<sup>2</sup>**.
 		- A intuição é que mesmo após observar *t* = *h*<sub>k</sub>(*m*), um adversário não ganha nenhuma informação sobre *h*<sub>k</sub>(*m*) nem sobre qualquer outra tag. Ou seja, do ponto de vista do adversário, todas as outras tags *t*' $\in$ $\mathcal{T}$ estão uniformemente distribuídas ainda.
 	- Por consequência, temos a seguinte construção: seja *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ uma função fortemente universal. Temos um MAC para mensagens em $\mathcal{M}$ com:
 		- **Gen**: devolve uma chave *k* $\in$ $\mathcal{K}$ uniformemente selecionada
 		- **Mac:** recebe a chave *k* $\in$ $\mathcal{K}$ e a mensagem *m* $\in$ $\mathcal{M}$ como entrada e devolve a tag *t* $\coloneqq$ *h*<sub>k</sub>(*m*)
 		- **Vrfy**: recebe a chave *k* $\in$ $\mathcal{K}$, a mensagem *m* $\in$ $\mathcal{M}$ e a tag *t* $\in$ $\mathcal{T}$ como entrada e devolve 1 $\iff$ *t* == *h*<sub>k</sub>(*m*)
 		- Se *h* é uma função fortemente segura, a construção acima é um MAC 1/|$\mathcal{T}$|-seguro de uso único para mensagens em $\mathcal{M}$.
-	- **Teorema**: Para qualquer número primo *p*, a função *h* a seguir é fortemente universal: ***h*<sub>a, b</sub>(*m*) $\stackrel{\text{def}}{=}$ [*a* * *m* + *b* mod *p*]
+	- **Teorema**: Para qualquer número primo *p*, a função *h* a seguir é fortemente universal: ***h*<sub>a, b</sub>(*m*) $\stackrel{\text{def}}{=}$ [*a* * *m* + *b* mod *p*]**
 	- **Construção**: Seja *h*: $\mathcal{K}$ x $\mathcal{M}$ $\rightarrow$ $\mathcal{T}$ uma função universal por diferença (*difference-universal*). Temos um MAC para mensagens em $\mathcal{M}$ com
 		- **Gen:** seleciona uma chave *k* $\in$ $\mathcal{K}$ uniforme e um *r* $\in$ $\mathcal{T}$ e devolve chave (*k*, *r*).
 		- **Mac:** recebe a chave (*k*, *r*) e a mensagem *m* $\in \mathcal{M}$ como entrada e devolve a tag *t* $\coloneqq$ *h*<sub>k</sub>(*m*) + *r*

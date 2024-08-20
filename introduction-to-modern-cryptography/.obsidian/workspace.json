@@ -158,7 +158,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
+    "width": 200,
     "collapsed": true
   },
   "left-ribbon": {
@@ -173,14 +173,14 @@
   },
   "active": "b19fe62f634e61c2",
   "lastOpenFiles": [
-    "chapter-03/notes.md",
-    "chapter-05/notes.md",
     "chapter-04/notes.md",
+    "chapter-05/notes.md",
+    "chapter-03/notes.md",
+    "chapter-03/solutions.md",
     "chapter-05/solutions.md",
     "chapter-04/solutions.md",
     "notes",
     "chapter-05",
-    "chapter-03/solutions.md",
     "chapter-02/notes.md",
     "chapter-04/assets/cbc-mac.png",
     "chapter-04/assets",
