@@ -32,11 +32,11 @@
 		- 3. *A* é bem sucedido (saída do experimento é 1) $\iff$ (1) *m* $\neq$ $\bot$ e (2) *m* $\notin$ *Q*.
 	- **Definição:** Um esquema criptográfico de chave privada $\Pi$ é **inforjável** se para qualquer adversário *A* PPT existe uma função *negl* tal que **P[Enc-Forge<sub>A, Π</sub>(*n*) = 1] $\le$ *negl***.
 	- **Definição 5.3:** Um esquema criptográfico de chave privada é um **esquema de encriptação autenticada (AE)** se ele é *CCA-seguro* e *inforjável*.
-	- Experimento de encriptação autenticada **PrivK<sub>A, $\Pi$</sub><sup>ae</sup>(*n*):**
+	- Experimento de encriptação autenticada **PrivK<sub>A, Π</sub><sup>ae</sup>(*n*):**
 		- 1. Uma chave *k* é gerada a partir de Gen(1<sup>n</sup>) e um bit uniforme *b* $\in$ {0, 1} é selecionado
 		- 2. O adversário *A* recebe 1<sup>n</sup> e é dado acesso à dois oráculos:
 			- (a) *b = 0*: *A* recebe acesso a Enc<sub>k</sub>(.) e Dec<sub>k</sub>(.)
-			- (b) *b = 1*: *A* recebe acesso a Enc<sub>k</sub><sup>0</sup>(.) e Dec<sub>$\bot$</sub>(.)
+			- (b) *b = 1*: *A* recebe acesso a Enc<sub>k</sub><sup>0</sup>(.) e Dec<sub>⟂</sub>(.)
 		- 3. O adversário devolve como resposta um bit *b'*
 		- 4. A saída do experimento é 1 $\iff$ *b'* == *b*. Dizemos nesse caso que o adversário *A* foi bem sucedido.
 		- Obviamente, o adversário *A* não tem permissão para consultar o oráculo Dec(.) com a saída de uma consulta ao oráculo Enc, pois assim tem-se um método de distinção trivial.
@@ -63,7 +63,37 @@
 			- Autenticação é realizada antes de tudo e depois a mensagem é encriptada juntamente à tag. 
 				- Dada uma mensagem *m*, o remetente envia o par [*c*, *t*], tal que *t* $\leftarrow$ Mac<sub>k<sub>M</sub></sub>(*m*) e *c* $\leftarrow$ Enc<sub>k<sub>E</sub></sub>(*m*||*t*).
 				- O recebedor decripta *c* para obter *m*||*t* e depois verifica a tag *t* a partir de Vrfy<sub>k<sub>M</sub></sub>(*m*, *t*).
+			- Muitas construções ainda não são CCA-seguras com *AtE*. Um exemplo é a apresentada na seção 5.1.1 (ataques de oráculo de *padding*), em que é feito a adição do *padding* e depois a encriptação em CBC. O ataque descrito continua sendo possível devido ao retorno de erro da função Dec(.).
+				- Uma possibilidade seria fazer Dec(.) retornar um erro genérico, independentemente da sua origem. Tornaria, porém, a construção específica, e o implementador teria que conhecer o funcionamento por trás, independentemente da sua segurança CPA.
+					- Mesmo com erros genéricos, ainda é possível diferenciar tipos diferentes de erros a partir do tempo de retorno de cada um. Versões de TLS já foram atacadas bem sucedidamente desse modo.
 		- *Encrypt-then-authenticate* (EtA)
 			- Encriptação é realizada primeiro e depois a tag é calculada a partir do resultado.
 				- Dada uma mensagem *m*, o remetente envia o par [*c*, *t*], tal que *c* $\leftarrow$ Enc<sub>k<sub>E</sub></sub>(*m*) e *t* $\leftarrow$ Mac<sub>k<sub>M</sub></sub>(*c*).
 				- Agora, o recebedor decripta verifica a tag com Vrfy<sub>k<sub>M</sub></sub>(*c*, *t*), e caso a saída seja 1, decripta *c* para obter a mensagem *m*.
+			- Melhor e única alternativa segura dentre as três construções apresentadas
+			- **Teorema:** Seja $\Pi$<sub>E</sub> um esquema criptográfico de chave privada CPA-seguro e $\Pi$<sub>M</sub> um MAC fortemente seguro. Então utilizar uma construção *EtA* com $\Pi$<sub>E</sub> e $\Pi$<sub>M</sub> gera um esquema de encriptação autenticada (AE).
+			- É possível lidar com informação associada (como headers) modificando ligeiramente a construção de *EtA*: *c* $\leftarrow$ Enc<sub>k<sub>E</sub></sub>(*m*) e *t* $\leftarrow$ Mac<sub>k<sub>M</sub></sub>(*d*||*c*).
+		- Independentemente do tipo de construção, instâncias diferentes de primitivas criptográficas devem sempre utilizar chaves independentes.
+	- 5.3.2 - Esquemas padronizados
+		- GCM (Galois / Counter Mode)
+			- Construído com base no CTR mode e no GMAC, ambos já discutidos. Funciona na estratégia de *E&M*.
+			- Utiliza o mesmo IV para encriptação do CTR e como nonce para o GMAC.
+				- Utilizar um IV repetido para duas mensagens diferentes implica em uma falha da segurança e uma quebra da integridade.
+			- Extremamente rápido e paralelizável quando instanciado com AES.
+		- CCM (Counter with CBC-MAC)
+			- Baseado em *AtE*, que, embora no geral não seja seguro, CCM pode ser provado como.
+			- Bem mais lento e não consegue ser paralelizado.
+		- ChaCha20-Poly1305
+			- Baseado em *EtA*, com a cifra de fluxo ChaCha20 em modo não sincronizado e o MAC Poly1305.
+			- Extremamente eficiente e rápido em software.
+	- ## 5.4 - Sessões de Comunicação Seguras
+		- Suponha dois indivíduos *A* e *B* com uma chave *k* combinada que buscam estabelecer uma sessão de comunicação segura a partir de um esquema de encriptação autenticada $\Pi$. Mesmo não conseguindo acesso ao conteúdo daquilo sendo comunicado, um atacante possui diversos modos de interferir com a comunicação dos indivíduos.
+			- *Re-ordering attack*
+				- Se *A* envia dois ciphertexts *c<sub>1</sub>* e *c<sub>2</sub>* referentes a duas mensagens diferentes, o atacante pode reordena-los e passar *c<sub>2</sub>* e depois *c<sub>1</sub>* para *B*, fazendo-o receber as mensagens em uma ordem diferente da planejada.
+			- *Replay attack*
+				- Se *A* enviou um ciphertext *c* para *B* previamente, o atacante pode reenviar o mesmo, fazendo *B* pensar que recebeu duas mensagens válidas iguais.
+			- *Message-dropping attack*
+				- O atacante pode bloquear o envio de certas mensagens entre os dois indivíduos, de modo a interferir na comunicação.
+			- *Reflection attack*
+				- O atacante pode enviar um ciphertext *c* enviado por *A* para o próprio *A*, fazendo-o interpretar que foi uma resposta de *B*.
+		- Os três primeiros ataques podem ser evitados concatenando um contador às mensagens, tal que o mesmo é incrementado a cada novo envio. Por último, o ataque de reflexão pode ser evitado se ambas partes concordarem em um bit representativo da comunicação de *A* para *B* e o complemento de tal bit representando mensagens de *B* para *A*.

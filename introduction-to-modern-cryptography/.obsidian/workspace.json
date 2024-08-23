@@ -8,19 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "e13b0c63fe648ccb",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "chapter-04/solutions.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "b3b2334e1e567d7b",
+            "id": "b19fe62f634e61c2",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -32,7 +20,7 @@
             }
           },
           {
-            "id": "b19fe62f634e61c2",
+            "id": "47c00ca8ddb768e3",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -44,7 +32,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -171,14 +159,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "b19fe62f634e61c2",
+  "active": "47c00ca8ddb768e3",
   "lastOpenFiles": [
     "chapter-04/notes.md",
     "chapter-05/notes.md",
+    "chapter-04/solutions.md",
     "chapter-03/notes.md",
     "chapter-03/solutions.md",
     "chapter-05/solutions.md",
-    "chapter-04/solutions.md",
     "notes",
     "chapter-05",
     "chapter-02/notes.md",
